@@ -40,11 +40,10 @@ module.exports = {
         } catch (err) {
             res.status(500).json({ error: err, message: "Internal server error" });
         }
-      });
       //   res.status(201).json({ message: "Duty Manager Added" });
-    } catch (err) {
-      res.status(500).json({ error: err, message: "Internal server error" });
-    }
+    // } catch (err) {
+    //   res.status(500).json({ error: err, message: "Internal server error" });
+    // }
   },
   update: async (req, res) => {
     DutyManagers.updateOne({ _id: req.params.dmId }, { $set: req.body })
