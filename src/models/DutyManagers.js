@@ -10,7 +10,7 @@ const dutyManSchema = new Schema({
         type: String,
         required: true
     },
-    licenceNumber: {
+    licenseNumber: {
         type: String,
         required: true
     },

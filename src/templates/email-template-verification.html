@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <style>
+    h1 {
+        text-align: center;
+    }
+    p {
+      text-align: center;
+      font-size: 16px;
+    }
+    div {
+      text-align: center;
+    }
+    .button {
+      background-color: #000000; /* Green */
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+    }
+  </style>
+  <body>
+    <img src="cid:unique@logo.png" width="100%"/>
+    <p>Dear {{name}},</p>
+    <p>Thank you for registering with us! To complete the verification process, please click on the verification link button below:</p>
+    <br/>
+    <div><a href="{{link}}" target="_blank" class="button">Verify your email address</a></div>
+    <br/>
+    <br/>
+    <p>Once you've clicked the button, your account will be verified, and you'll be able to use all features.</p>
+    <p>If you haven't registered for an account with us, please ignore this email. However, feel free to contact our support team at [support email address] if you have any concerns.</p>
+    <p>Thank you for choosing our platform.</p>
+    <p>Best regards, </p>
+    <p>The Hospitality Guardian</p>
+  </body>
+</html>

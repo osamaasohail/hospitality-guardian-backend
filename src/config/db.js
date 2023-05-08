@@ -1,3 +1,3 @@
-var url = 'mongodb+srv://hamzaali5542:hamza123@cluster0.caxwlnb.mongodb.net/test';
-//var url = 'mongodb://localhost:27017/fyp-web'
+require("dotenv").config();
+var url = process.env.MONGODB_URL;
 module.exports = url;
