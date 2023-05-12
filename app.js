@@ -25,6 +25,7 @@ require('./src/routes/dutyManager')(app);
 require('./src/routes/individual-licenses')(app);
 require('./src/routes/stripe')(app);
 require('./src/services/notifications');
+require('./src/routes/notificationRoute')(app);
 app.use((req, res, next) => {
     next(createError(404));
 });

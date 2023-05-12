@@ -59,6 +59,12 @@ module.exports = {
               },
             ],
             mode: "subscription",
+            metadata: {
+              userId: req.user._id,
+              type: "businessLicense",
+              quantity: req.body.quantity,
+              isNew: true
+            }
           });
 
           res
