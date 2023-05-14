@@ -10,7 +10,7 @@ function auth(req, res, next) {
     req.user = verified;
     next();
   } catch (err) {
-    res.status(400).send('Invalid token.');
+    res.status(401).send('Invalid token.');
   }
 }
 module.exports = auth;

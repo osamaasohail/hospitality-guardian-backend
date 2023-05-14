@@ -14,6 +14,7 @@ var subscriptionSchema = new Schema(
     customerId: { type: String },
     subscriptionId: { type: String },
     paymentAmount: { type: Number },
+    expiresAt: { type: Date },
   },
   { timestamps: true }
 );

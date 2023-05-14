@@ -55,7 +55,7 @@ module.exports = {
     switch (event.type) {
       case "invoice.paid":
         const invoicePaid = event.data.object;
-        console.log(`Invoice paid`, invoicePaid);
+        return res.status(200).json({ message: "Invoice paid" });
         // Then define and call a method to handle the successful payment intent.
         // handlePaymentIntentSucceeded(paymentIntent);
         break;
@@ -65,10 +65,13 @@ module.exports = {
           "checkout.session.async_payment_succeeded",
           checkoutPaymentSucceeded
         );
+        return res.status(200).json({ message: "Payment succeeded" });
+
         // Then define and call a method to handle the successful attachment of a PaymentMethod.
         // handlePaymentMethodAttached(paymentMethod);
         break;
       case "checkout.session.completed":
+        console.log("checkout.session.completed");
         const session = event.data.object;
         const customerId = session.customer;
         const subscriptionId = session.subscription;
@@ -86,47 +89,30 @@ module.exports = {
             customerId: customerId,
             subscriptionId: subscriptionId,
             paymentAmount: paymentAmount / 100,
+            expiresAt: new Date(session.expires_at*1000),
           };
-          console.log("subscription", subscriptionData);
-          console.log("Subscription model", Subscription);
           const newSubscription = new Subscription(subscriptionData);
-          newSubscription
-            .save()
-            .then((savedSubscription) => {
-              User.updateOne(
-                { _id: metadata.userId },
-                { isProfileCompleted: true }
-              )
-                .then((updatedDocument) => {
-                  console.log("User updated successfully ", updatedDocument)
-                  // res.status(201).json({ doc: updatedDocument });
-                })
-                .catch((err) => {
-                  res
-                    .status(500)
-                    .json({ error: err, message: "Internal server error" });
-                });
-              return res.status(200).json({
-                message: "Subscription saved successfully",
-                subscription: savedSubscription,
-              });
-            })
-            .catch((error) => {
-              return res.status(400).json({
-                message: "Error in saving subscription",
-                error: error,
-              });
-            });
+          const newSubscriptionResponse = await newSubscription.save();
+          await User.updateOne(
+            { _id: metadata.userId },
+            { isProfileCompleted: true }
+          );
+          console.log("New Subscription", newSubscriptionResponse);
+          return res
+            .status(200)
+            .json({ message: "Subscription saved successfully" });
         } catch (err) {
           console.log(
             "Error in stripe webhook checkout session completed",
             err
           );
+          res.status(500).json({ error: "Internal server error" });
         }
         break;
       case "plan.created":
         const planCreated = event.data.object;
         console.log("planCreated", planCreated);
+        return res.status(200).json({ message: "Plan created" });
         // Then define and call a method to handle the successful attachment of a PaymentMethod.
         // handlePaymentMethodAttached(paymentMethod);
         break;
@@ -135,6 +121,7 @@ module.exports = {
         console.log("planUpdated", planUpdated);
         // Then define and call a method to handle the successful attachment of a PaymentMethod.
         // handlePaymentMethodAttached(paymentMethod);
+        return res.status(200).json({ message: "Plan updated" });
         break;
       default:
         // Unexpected event type
@@ -143,5 +130,18 @@ module.exports = {
 
     // Return a 200 res to acknowledge receipt of the event
     res.send();
+  },
+  subscription: async (req, res) => {
+    try {
+      const getSubscription = await Subscription.findOne({
+        refUser: req.user._id,
+        isActive: true,
+      });
+      return res.status(200).json({ subscription: getSubscription });
+      
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "Internal server error" });
+    }
   },
 };

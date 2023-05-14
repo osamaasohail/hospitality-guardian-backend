@@ -37,6 +37,12 @@ module.exports = {
                 quantity: 1,
               },
             ],
+            metadata: {
+              userId: req.user._id,
+              type: "individualLicense",
+              quantity: 1,
+              isNew: true
+            },
             mode: "subscription",
           });
           res
