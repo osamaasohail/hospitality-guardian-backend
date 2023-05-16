@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const stripe = require("stripe")(
   "sk_test_51K6TTUFJlvwC7pufNo15hNsO02Wa5VrTCaTSi7trrXHw2ju5T8RGLCrQUQI4RQ3sewOMTN4ENyizBeRDkafCVEe700RCDvZkzj"
 );
+require("dotenv").config();
 
 module.exports = {
   add: async (req, res) => {
@@ -19,6 +20,7 @@ module.exports = {
         gamingLicense: req.body.gamingLicense,
         gamingLicenseExpiry: req.body.gamingLicenseExpiry,
         sendNotiBeforeExpiry: req.body.sendNotiBeforeExpiry,
+        isGamingLicenseEnabled: req.body.isGamingLicenseEnabled,
         dutyManagers: [],
         isActive: true,
       };
@@ -50,11 +52,11 @@ module.exports = {
             success_url: "http://localhost:3000/profile/edit-profile",
             line_items: [
               {
-                price: "price_1N4HsVFJlvwC7pufAWMaVGCL",
+                price: process.env.DUTY_MANAGER_PRODUCT_PRICE_ID,
                 quantity: req.body.quantity,
               },
               {
-                price: "price_1N4HryFJlvwC7pufkohQUZMb",
+                price: process.env.BUSINESS_PRODUCT_PRICE_ID,
                 quantity: 1,
               },
             ],
@@ -90,7 +92,6 @@ module.exports = {
         match: { isActive: true },
       })
       .then((docs) => {
-        console.log("Docs is ", docs[0].dutyManagers);
         res.status(201).json({ licenses: docs });
       })
       .catch((err) => {

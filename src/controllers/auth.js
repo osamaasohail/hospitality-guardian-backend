@@ -11,7 +11,6 @@ const crypto = require("crypto");
 module.exports = {
   register: async (req, res) => {
     try {
-      console.log(req.body);
       const { name, email, password, accountType } = req.body;
       // Check if the user already exists
       const userExists = await User.findOne({ email });
@@ -35,22 +34,22 @@ module.exports = {
       // Save the user to the database
       let myNewUser = await user.save();
       // Send a verification email to the user
-      // const transporter = nodemailer.createTransport({
-      //     service: "gmail",
-      //     auth: {
-      //         user: process.env.EMAIL,
-      //         pass: process.env.PASSWORD,
-      //     },
-      // });
       const transporter = nodemailer.createTransport({
-        host: process.env.HOST,
-        port: 587,
-        secure: false, // Set to true if you're using a secure connection (TLS/SSL)
-        auth: {
-          user: process.env.EMAIL, // Replace with your email address
-          pass: process.env.PASSWORD, // Replace with your email password or an app-specific password
-        },
+          service: "gmail",
+          auth: {
+              user: process.env.EMAIL,
+              pass: process.env.PASSWORD,
+          },
       });
+      // const transporter = nodemailer.createTransport({
+      //   host: process.env.HOST,
+      //   port: 587,
+      //   secure: false, // Set to true if you're using a secure connection (TLS/SSL)
+      //   auth: {
+      //     user: process.env.EMAIL, // Replace with your email address
+      //     pass: process.env.PASSWORD, // Replace with your email password or an app-specific password
+      //   },
+      // });
       const source = fs.readFileSync(
         "src/templates/email-template-verification.html",
         "utf8"
@@ -157,10 +156,8 @@ module.exports = {
   sendPasswordRequest: async (req, res) => {
     try {
       const { email } = req.body;
-      console.log("Email is ", email);
       // Find the user by email
       const user = await User.findOne({ email });
-      console.log("User is ", req.body);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -175,22 +172,22 @@ module.exports = {
       await user.save();
       const link = `${process.env.FRONTEND_URL}/profile/reset-password?token=${resetToken}`;
       console.log("Link is " + link);
-      //   const transporter = nodemailer.createTransport({
-      //     service: "gmail",
-      //     auth: {
-      //       user: process.env.EMAIL,
-      //       pass: process.env.PASSWORD,
-      //     },
-      //   });
-      const transporter = nodemailer.createTransport({
-        host: process.env.HOST,
-        port: 587,
-        secure: false, // Set to true if you're using a secure connection (TLS/SSL)
-        auth: {
-          user: process.env.EMAIL, // Replace with your email address
-          pass: process.env.PASSWORD, // Replace with your email password or an app-specific password
-        },
-      });
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.EMAIL,
+            pass: process.env.PASSWORD,
+          },
+        });
+      // const transporter = nodemailer.createTransport({
+      //   host: process.env.HOST,
+      //   port: 587,
+      //   secure: false, // Set to true if you're using a secure connection (TLS/SSL)
+      //   auth: {
+      //     user: process.env.EMAIL, // Replace with your email address
+      //     pass: process.env.PASSWORD, // Replace with your email password or an app-specific password
+      //   },
+      // });
       const source = fs.readFileSync(
         "src/templates/email-template-requestPassword.html",
         "utf8"

@@ -5,9 +5,9 @@ const fs = require("fs");
 const handlebars = require("handlebars");
 const nodemailer = require("nodemailer");
 const notificationsSchema = require("../models/notifications");
-cron.schedule("0 */12 * * *", async () => {
+// cron.schedule("0 */12 * * *", async () => {
   // for business licenses
-  // cron.schedule('*/5 * * * * *', async () => {
+  cron.schedule('*/15 * * * * *', async () => {
   console.log("for business licenses");
   let licenses = await BusinessLicense.find().populate("refUser");
   console.log(licenses);
@@ -23,23 +23,23 @@ cron.schedule("0 */12 * * *", async () => {
           businessLicense: license._id,
           sendNotiDay: license.sendNotiBeforeExpiry[i],
         });
-        if (sendNotification && notification.length === 0) {
-          // const transporter = nodemailer.createTransport({
-          //     service: "gmail",
-          //     auth: {
-          //         user: process.env.EMAIL,
-          //         pass: process.env.PASSWORD
-          //     }
-          // });
+        if (notification.length === 0) {
           const transporter = nodemailer.createTransport({
-            host: process.env.HOST,
-            port: 587,
-            secure: false, // Set to true if you're using a secure connection (TLS/SSL)
-            auth: {
-              user: process.env.EMAIL, // Replace with your email address
-              pass: process.env.PASSWORD, // Replace with your email password or an app-specific password
-            },
+              service: "gmail",
+              auth: {
+                  user: process.env.EMAIL,
+                  pass: process.env.PASSWORD
+              }
           });
+          // const transporter = nodemailer.createTransport({
+          //   host: process.env.HOST,
+          //   port: 587,
+          //   secure: false, // Set to true if you're using a secure connection (TLS/SSL)
+          //   auth: {
+          //     user: process.env.EMAIL, // Replace with your email address
+          //     pass: process.env.PASSWORD, // Replace with your email password or an app-specific password
+          //   },
+          // });
           const source = fs.readFileSync(
             "src/templates/email-template-license.html",
             "utf8"
@@ -88,17 +88,17 @@ cron.schedule("0 */12 * * *", async () => {
     }
   });
 });
-// cron.schedule('*/5 * * * * *', async () => {
-cron.schedule("0 */12 * * *", async () => {
+cron.schedule('*/5 * * * * *', async () => {
+// cron.schedule("0 */12 * * *", async () => {
   // for individual licenses
   console.log("for individual licenses");
   let licenses = await IndividualLicense.find()
     .populate("refUser")
     .populate("dutyManager");
-  console.log(licenses);
+  console.log("IND Licnese : ", licenses);
   licenses.forEach(async (license) => {
     let expiryDate = new Date(license.dutyManager.expiryDate).getTime();
-    // let sendNotification = false;
+    let sendNotification = false;
     for (let i = 0; i < license.sendNotiBeforeExpiry.length; i++) {
       let date = new Date();
       date.setDate(date.getDate() + license.sendNotiBeforeExpiry[i]);
@@ -108,7 +108,7 @@ cron.schedule("0 */12 * * *", async () => {
           individualLicense: license._id,
           sendNotiDay: license.sendNotiBeforeExpiry[i],
         });
-        if (sendNotification && notification.length === 0) {
+        if (notification.length === 0) {
           const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {

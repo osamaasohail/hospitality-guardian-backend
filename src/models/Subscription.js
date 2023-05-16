@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 var subscriptionSchema = new Schema(
   {
@@ -15,6 +15,14 @@ var subscriptionSchema = new Schema(
     subscriptionId: { type: String },
     paymentAmount: { type: Number },
     expiresAt: { type: Date },
+    subscriptionItems: [
+      {
+        id: { type: String },
+        priceId: { type: String },
+        quantity: { type: Number },
+        isDutyManager: { type: Boolean },
+      },
+    ],
   },
   { timestamps: true }
 );

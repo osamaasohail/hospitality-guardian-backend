@@ -77,6 +77,22 @@ module.exports = {
         const subscriptionId = session.subscription;
         const paymentAmount = session.amount_total;
         const metadata = session.metadata;
+        const currentSubscription = await stripe.subscriptions.retrieve(
+          subscriptionId
+        );
+        var subscriptionItems = currentSubscription.items.data;
+        var items = [];
+        subscriptionItems.forEach(async (item) => {
+          var isDutyManager = false;
+          if (process.env.DUTY_MANAGER_PRODUCT_PRICE_ID === item.price.id) {
+            isDutyManager = true;
+          }
+          items.push({
+            id: item.id,
+            quantity: item.quantity,
+            isDutyManager: isDutyManager,
+          });
+        });
         try {
           const objectId = new mongoose.Types.ObjectId();
           const subscriptionData = {
@@ -89,7 +105,8 @@ module.exports = {
             customerId: customerId,
             subscriptionId: subscriptionId,
             paymentAmount: paymentAmount / 100,
-            expiresAt: new Date(session.expires_at*1000),
+            expiresAt: new Date(session.expires_at * 1000),
+            subscriptionItems: items,
           };
           const newSubscription = new Subscription(subscriptionData);
           const newSubscriptionResponse = await newSubscription.save();
@@ -137,11 +154,109 @@ module.exports = {
         refUser: req.user._id,
         isActive: true,
       });
-      return res.status(200).json({ subscription: getSubscription });
-      
+      const subscription = await stripe.subscriptions.retrieve(
+        getSubscription?.subscriptionId
+      );
+      const upcomingInvoice = await stripe.invoices.retrieveUpcoming({
+        subscription: getSubscription?.subscriptionId,
+      });
+      const totalQuantity = getSubscription?.subscriptionItems.reduce(
+        (sum, item) => sum + item.quantity,
+        0
+      );
+      return res
+        .status(200)
+        .json({
+          nextInvoicePrice: upcomingInvoice?.amount_due/100,
+          nextInvoiceDate: subscription?.current_period_end,
+          totalQuantity: totalQuantity,
+        });
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: "Internal server error" });
     }
+  },
+  test: async (req, res) => {
+    const subscriptionId = "sub_1N7vnvFJlvwC7puf1aK5oZMw";
+    const subscription1 = await stripe.subscriptions.retrieve(subscriptionId);
+    const upcomingInvoice = await stripe.invoices.retrieveUpcoming({
+      subscription: subscriptionId,
+    });
+    return res.status(200).json({ subscription1, upcomingInvoice });
+    var subscriptionItems = subscription1.items.data;
+    var items = [];
+    subscriptionItems.forEach(async (item) => {
+      var isDutyManager = false;
+      if (process.env.DUTY_MANAGER_PRODUCT_PRICE_ID === item.price.id) {
+        isDutyManager = true;
+      }
+      items.push({
+        id: item.id,
+        quantity: item.quantity,
+        isDutyManager: isDutyManager,
+      });
+    });
+    return res.status(200).json({ subscription1, items });
+    const subscription = await stripe.subscriptions.update(subscriptionId, {
+      items: [
+        { id: "si_NtXYYawyiwfbz9", quantity: 3 },
+        // { id: "si_NtXYYawyiwfbz9", quantity: 3 },
+        // { id: "si_NtXY95BzCS6oKe", quantity: 1 }
+      ],
+    });
+    console.log("subscription", subscription);
+    res.status(200).json({ message: "Success", subscription });
+    // stripe.subscriptions.retrieve(subscriptionId, function(err, subscription) {
+    //   if (err) {
+    //     console.error('Error retrieving subscription:', err);
+    //     res.status(400).json({ error: "Error retrieving subscription" });
+    //     return;
+    //   }
+    //   console.log('Subscription retrieved:', subscription);
+
+    //   // Update the quantity for the desired product/item
+    //   const updatedItems = subscription.items.data.map(item => {
+    //     if (item.price.id === process.env.DUTY_MANAGER_PRODUCT_PRICE_ID) {
+    //       // Update the quantity for the desired product
+    //       return {
+    //         price: item.price.id,
+    //         quantity: 3
+    //       };
+    //     }
+    //     return item;
+    //   });
+
+    //   // Update the subscription with the modified items
+    //   stripe.subscriptions.update(subscriptionId, { items: updatedItems }, function(err, updatedSubscription) {
+    //     if (err) {
+    //       console.error('Error updating subscription:', err);
+    //       res.status(400).json({ error: "Error updating subscription", err });
+    //       return;
+    //     }
+
+    //     console.log('Subscription updated:', updatedSubscription);
+    //     res.status(200).json({ subscription: updatedSubscription });
+    //   });
+    // });
+    // stripe.subscriptions.update(
+    //   subscriptionId,
+    //   {
+    //     items: [
+    //       {
+    //         price: "price_1N4HsVFJlvwC7pufAWMaVGCL",
+    //         quantity: 3,
+    //       },
+    //     ]
+    //   },
+    //   function (err, subscription) {
+    //     if (err) {
+    //       console.error("Error updating subscription quantity:", err);
+    //       return res.status(400).json({ error: err });
+    //     }
+
+    //     console.log("Subscription updated:", subscription);
+    //     res.status(200).json({ subscription: subscription });
+    //   }
+    // );
   },
 };

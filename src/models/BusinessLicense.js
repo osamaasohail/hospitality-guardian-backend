@@ -10,6 +10,7 @@ const businessLicenseSchema = new Schema({
   expiryDate: { type: Date, default: false },
   gamingLicense: { type: String},
   gamingLicenseExpiry: {type: Date},
+  isGamingLicenseEnabled: {type: Boolean},
   sendNotiBeforeExpiry: [{type: Number}], // in days
   isActive: {type: Boolean}
 }, { timestamps: true });
