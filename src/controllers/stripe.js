@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 require("dotenv").config();
 const stripe = require("stripe")(
-  "sk_test_51K6TTUFJlvwC7pufNo15hNsO02Wa5VrTCaTSi7trrXHw2ju5T8RGLCrQUQI4RQ3sewOMTN4ENyizBeRDkafCVEe700RCDvZkzj"
+  "sk_test_51Ml5u1B46Hybyi0DScxDrKlLM4qbLwekHUYEXRrmssqwhxS66rVFBGDSgYuU5GK5BBGBD3yHBfLZw27Q7NADMYV400ZlIIfSC3"
 );
 const endpointSecret = "whsec_R4BfBt102fRADUVgIo6s3UOy0UqmCG6e";
 const mongoose = require("mongoose");
@@ -14,7 +14,7 @@ module.exports = {
   session: async (req, res) => {
     try {
       const session = await stripe.checkout.sessions.create({
-        success_url: "http://localhost:3000/profile/edit-profile",
+        success_url: `${process.env.FRONTEND_URL}/profile/edit-profile`,
         line_items: [
           {
             price: "price_1MxytJFJlvwC7pufBIhIxwDL",
