@@ -15,8 +15,7 @@ dist/
 build/
 
 # Environment files
-.env
-.env.*
+
 config/env.json
 
 # Other
