@@ -26,6 +26,9 @@ require('./src/routes/individual-licenses')(app);
 require('./src/routes/stripe')(app);
 require('./src/services/notifications');
 require('./src/routes/notificationRoute')(app);
+app.get('/test', function (req,res) {
+    return res.send('Hello World')
+})
 app.use((req, res, next) => {
     next(createError(404));
 });
