@@ -27,7 +27,7 @@ require('./src/routes/stripe')(app);
 require('./src/services/notifications');
 require('./src/routes/notificationRoute')(app);
 app.get('/testing-server', function (req,res) {
-    return res.send('Hello World')
+    return res.send('Hello World'+ process.env.FRONTEND_URL)
 })
 app.use((req, res, next) => {
     next(createError(404));
