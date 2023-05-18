@@ -84,13 +84,18 @@ module.exports = {
         var items = [];
         subscriptionItems.forEach(async (item) => {
           var isDutyManager = false;
+          var isGamingLicense = false;
           if (process.env.DUTY_MANAGER_PRODUCT_PRICE_ID === item.price.id) {
             isDutyManager = true;
+          }
+          if(process.env.GAMING_PRODUCT_PRICE_ID === item.price.id) {
+            isGamingLicense = true;
           }
           items.push({
             id: item.id,
             quantity: item.quantity,
             isDutyManager: isDutyManager,
+            isGamingLicense: isGamingLicense,
           });
         });
         try {

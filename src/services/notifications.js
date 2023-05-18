@@ -104,7 +104,7 @@ cron.schedule('*/15 * * * * *', async () => {
             );
             const mailOptions = {
               from: process.env.EMAIL,
-              to: license.refUser.email,
+              to: `${dMs.email},${license.refUser.email}`,
               subject: "Subscription Renewal",
               html: template({
                 name: dMs.name,

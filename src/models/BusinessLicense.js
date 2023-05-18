@@ -12,6 +12,7 @@ const businessLicenseSchema = new Schema({
   gamingLicenseExpiry: {type: Date},
   isGamingLicenseEnabled: {type: Boolean},
   sendNotiBeforeExpiry: [{type: Number}], // in days
-  isActive: {type: Boolean}
+  isActive: {type: Boolean},
+  isBusinessLicensePaid: {type: Boolean},
 }, { timestamps: true });
 module.exports = mongoose.model('businessLicense', businessLicenseSchema);

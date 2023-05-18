@@ -8,4 +8,7 @@ module.exports = (app) => {
     app.route('/business-license/:id')
         .put(authorize, businessLicenseController.update)
         .delete(authorize, businessLicenseController.delete)
+    app.route('/business-license/:id/gamingLicense')
+        .delete(authorize, businessLicenseController.deleteGamingLicense)
+        .post(authorize, businessLicenseController.addGamingLicense)
 }
