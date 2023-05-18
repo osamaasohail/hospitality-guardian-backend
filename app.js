@@ -27,7 +27,7 @@ require('./src/routes/stripe')(app);
 require('./src/services/notifications');
 require('./src/routes/notificationRoute')(app);
 app.get('/testing-server', function (req,res) {
-    return res.send('Hello World'+ process.env.FRONTEND_URL)
+    return res.status(200).json({message: 'Server is working', frontendurl: process.env.FRONTEND_URL, dutyManagerPriceId: process.env.DUTY_MANAGER_PRODUCT_PRICE_ID, businessLicensePriceId: process.env.BUSINESS_PRODUCT_PRICE_ID});
 })
 app.use((req, res, next) => {
     next(createError(404));
