@@ -42,7 +42,10 @@ cron.schedule('*/15 * * * * *', async () => {
             diffInMilliseconds / (24 * 60 * 60 * 1000)
           );
           const mailOptions = {
-            from: process.env.EMAIL,
+            from: {
+              name: 'The Hospitality Guardian',
+              address: process.env.EMAIL
+            },
             to: license.refUser.email,
             subject: "Subscription Renewal",
             html: template({
@@ -103,9 +106,13 @@ cron.schedule('*/15 * * * * *', async () => {
               diffInMilliseconds / (24 * 60 * 60 * 1000)
             );
             const mailOptions = {
-              from: process.env.EMAIL,
-              to: `${dMs.email},${license.refUser.email}`,
+              from: {
+                name: 'The Hospitality Guardian',
+                address: process.env.EMAIL
+              },
+              to: `${dMs.email}`,
               subject: "Subscription Renewal",
+              cc: license?.refUser?.email,
               html: template({
                 name: dMs.name,
                 licenseName: license.name,
@@ -179,7 +186,10 @@ cron.schedule('*/5 * * * * *', async () => {
             diffInMilliseconds / (24 * 60 * 60 * 1000)
           );
           const mailOptions = {
-            from: process.env.EMAIL,
+            from: {
+              name: 'The Hospitality Guardian',
+              address: process.env.EMAIL
+            },
             to: license.refUser.email,
             subject: "Subscription Renewal",
             html: template({

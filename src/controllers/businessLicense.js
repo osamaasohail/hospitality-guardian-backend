@@ -140,8 +140,8 @@ module.exports = {
   },
   deleteGamingLicense: async (req, res) => {
     BusinessLicense.updateOne(
-      { refUser: req.params.id },
-      { $set: req.body },
+      { refUser: req.user._id },
+      { $set: {isGamingLicenseEnabled: false} },
       { new: true }
     )
       .then(async (updatedDocument) => {

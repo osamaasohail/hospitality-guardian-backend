@@ -59,7 +59,10 @@ module.exports = {
         process.env.BASE_URL
       }/verify-email/${myNewUser._id.toString()}?token=${verificationToken}`;
       const mailOptions = {
-        from: process.env.EMAIL,
+        from: {
+          name: 'The Hospitality Guardian',
+          address: process.env.EMAIL
+        },
         to: email,
         subject: "Email Verification",
         html: template({ name: name, link: link }),
@@ -108,12 +111,31 @@ module.exports = {
 
       const token = user.generateAuthToken();
       if(!user?.isVerified) {
-        res.status(400).json({
+        return res.status(400).json({
           message: "Email not verified"
         });
       }
       res.status(201).json({
         message: "User Logged In Succesfully",
+        token: token,
+        user: user,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server error" });
+    }
+  },
+  me: async (req, res) => {
+    try {
+      const user = await User.findOne({ _id: req.user._id });
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+
+      const token = user.generateAuthToken();
+
+      res.status(201).json({
+        message: "Successfuly get user",
         token: token,
         user: user,
       });
@@ -198,7 +220,10 @@ module.exports = {
       );
       const template = handlebars.compile(source);
       const mailOptions = {
-        from: process.env.EMAIL,
+        from: {
+          name: 'The Hospitality Guardian',
+          address: process.env.EMAIL
+        },
         to: email,
         subject: "Reset Your Password",
         html: template({ link: link }),

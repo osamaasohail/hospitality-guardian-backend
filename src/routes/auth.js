@@ -1,8 +1,11 @@
 const authController = require('../controllers/auth');
+const authorize = require('../middlewares/authorize');
 module.exports = (app) => {
     
     app.route('/users')
         .get(authController.getUsers);
+    app.route('/user')
+        .get(authorize, authController.me);
     app.route('/update-user/:id')
         .put(authController.updateUser)
     app.route('/register')
