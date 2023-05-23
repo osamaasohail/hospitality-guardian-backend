@@ -196,7 +196,7 @@ module.exports = {
       const mailOptions = {
         from: process.env.EMAIL,
         to: email,
-        subject: "Email Verification",
+        subject: "Reset Your Password",
         html: template({ link: link }),
         attachments: [
           {

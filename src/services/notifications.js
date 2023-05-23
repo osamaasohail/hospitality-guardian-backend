@@ -69,7 +69,7 @@ cron.schedule('*/15 * * * * *', async () => {
             name: "License Expiry Notification",
             createdBy: "System",
             refUser: license.refUser._id,
-            businessLicense: license._id,
+            businessLicense: license.licenseNumber,
             sendNotiDay: license.sendNotiBeforeExpiry[i],
           };
           const doc = new notificationsSchema(notifications);
@@ -130,7 +130,7 @@ cron.schedule('*/15 * * * * *', async () => {
               name: "License Expiry Notification For Duty Manager",
               createdBy: "System",
               refUser: dMs._id,
-              businessLicense: license._id,
+              businessLicense: license.licenseNumber,
               sendNotiDay: license.sendNotiBeforeExpiry[i],
             };
             const doc = new notificationsSchema(notifications);
@@ -206,7 +206,7 @@ cron.schedule('*/5 * * * * *', async () => {
             name: "License Expiry Notification",
             createdBy: "System",
             refUser: license.refUser._id,
-            individualLicense: license._id,
+            individualLicense: license?.dutyManager?.licenseNumber,
             sendNotiDay: license.sendNotiBeforeExpiry[i],
           };
           const doc = new notificationsSchema(notifications);
