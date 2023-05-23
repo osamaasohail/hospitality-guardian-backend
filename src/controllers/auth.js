@@ -107,7 +107,11 @@ module.exports = {
       }
 
       const token = user.generateAuthToken();
-
+      if(!user?.isVerified) {
+        res.status(400).json({
+          message: "Email not verified"
+        });
+      }
       res.status(201).json({
         message: "User Logged In Succesfully",
         token: token,
