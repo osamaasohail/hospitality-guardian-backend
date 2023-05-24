@@ -10,8 +10,14 @@ const notificationsSchema = new Schema({
         type: String,
         required: true
     },
+    type: {
+        type: String,
+        required: true
+    },
     refUser: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User'},
     businessLicense: { type: mongoose.Schema.Types.ObjectId, ref: 'businessLicense'},
+    licenseNumber: { type: String, required: true},
+    expiryDate: { type: String, required: true },
     individualLicense: { type: mongoose.Schema.Types.ObjectId, ref: 'individualLicense'},
     sendNotiDay: { type: Number, required: true }
 }, { timestamps: true });
