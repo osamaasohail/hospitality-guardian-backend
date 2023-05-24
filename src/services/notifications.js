@@ -292,6 +292,16 @@ cron.schedule('*/5 * * * * *', async () => {
           const diffInDays = Math.floor(
             diffInMilliseconds / (24 * 60 * 60 * 1000)
           );
+          let templateDay = '';
+          if (diffInDays > 1) {
+            templateDay = `in ${diffInDays} days`;
+          }
+          if (diffInDays === 1) {
+            templateDay = `tomorrow`;
+          }
+          if (diffInDays === 0) {
+            templateDay = `today`;
+          }
           const mailOptions = {
             from: {
               name: 'The Hospitality Guardian',
@@ -302,7 +312,7 @@ cron.schedule('*/5 * * * * *', async () => {
             html: template({
               name: license.refUser.name,
               licenseName: license.name,
-              xDays: diffInDays,
+              xDays: templateDay,
             }),
             attachments: [
               {
