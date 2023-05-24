@@ -7,7 +7,7 @@ const nodemailer = require("nodemailer");
 const notificationsSchema = require("../models/notifications");
 // cron.schedule("0 */12 * * *", async () => {
   // for business licenses
-cron.schedule('0 */12 * * *', async () => {
+cron.schedule('*/15 * * * * *', async () => {
   console.log("for business licenses");
   let licenses = await BusinessLicense.find().populate("refUser").populate('dutyManagers');
   console.log(licenses);
@@ -254,7 +254,7 @@ cron.schedule('0 */12 * * *', async () => {
     }
   });
 });
-cron.schedule('0 */12 * * *', async () => {
+cron.schedule('*/15 * * * * *', async () => {
 // cron.schedule("0 */12 * * *", async () => {
   // for individual licenses
   console.log("for individual licenses");
