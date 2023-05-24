@@ -20,10 +20,10 @@ cron.schedule('*/15 * * * * *', async () => {
         let notification = await notificationsSchema.find({
           refUser: license.refUser._id,
           businessLicense: license._id,
+          type: 'BL',
           sendNotiDay: license.sendNotiBeforeExpiry[i],
         });
         if (notification.length === 0) {
-          console.log(license);
           const transporter = nodemailer.createTransport({
               service: "gmail",
               auth: {
@@ -41,6 +41,16 @@ cron.schedule('*/15 * * * * *', async () => {
           const diffInDays = Math.floor(
             diffInMilliseconds / (24 * 60 * 60 * 1000)
           );
+          let templateDay = '';
+          if (diffInDays > 1) {
+            templateDay = `in ${diffInDays} days`;
+          }
+          if (diffInDays === 1) {
+            templateDay = `tomorrow`;
+          }
+          if (diffInDays === 0) {
+            templateDay = `today`;
+          }
           const mailOptions = {
             from: {
               name: 'The Hospitality Guardian',
@@ -51,7 +61,7 @@ cron.schedule('*/15 * * * * *', async () => {
             html: template({
               name: license.refUser.name,
               licenseName: license.name,
-              xDays: diffInDays,
+              xDays: templateDay,
             }),
             attachments: [
               {
@@ -72,11 +82,93 @@ cron.schedule('*/15 * * * * *', async () => {
             name: "License Expiry Notification",
             createdBy: "System",
             refUser: license.refUser._id,
-            businessLicense: license.licenseNumber,
+            type: 'BL',
+            licenseNumber: license.licenseNumber,
+            businessLicense: license._id,
+            expiryDate: license.expiryDate,
             sendNotiDay: license.sendNotiBeforeExpiry[i],
           };
           const doc = new notificationsSchema(notifications);
           await doc.save();
+        }
+      }
+      if (license.isGamingLicenseEnabled) {
+        let expiryDateGM = new Date(license.gamingLicenseExpiry).getTime();
+        if (dateLicense.getTime() > expiryDateGM) {
+          let notification = await notificationsSchema.find({
+            refUser: license.refUser._id,
+            businessLicense: license._id,
+            type: 'GL',
+            sendNotiDay: license.sendNotiBeforeExpiry[i],
+          });
+          if (notification.length === 0) {
+            const transporter = nodemailer.createTransport({
+              service: "gmail",
+              auth: {
+                  user: process.env.EMAIL,
+                  pass: process.env.PASSWORD
+              }
+          });
+          const source = fs.readFileSync(
+            "src/templates/email-template-license.html",
+            "utf8"
+          );
+          const template = handlebars.compile(source);
+          let myDate = new Date();
+          const diffInMilliseconds = Math.abs(expiryDate - myDate.getTime()); // get the difference in milliseconds
+          const diffInDays = Math.floor(
+            diffInMilliseconds / (24 * 60 * 60 * 1000)
+          );
+          let templateDay = '';
+          if (diffInDays > 1) {
+            templateDay = `in ${diffInDays} days`;
+          }
+          if (diffInDays === 1) {
+            templateDay = `tomorrow`;
+          }
+          if (diffInDays === 0) {
+            templateDay = `today`;
+          }
+          const mailOptions = {
+            from: {
+              name: 'The Hospitality Guardian',
+              address: process.env.EMAIL
+            },
+            to: license.refUser.email,
+            subject: "Subscription Renewal",
+            html: template({
+              name: license.refUser.name,
+              licenseName: license.name,
+              xDays: templateDay,
+            }),
+            attachments: [
+              {
+                filename: "logo.png",
+                path: "src/templates/Email-Template.png",
+                cid: "unique@logo.png",
+              },
+            ],
+          };
+          transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log("Email sent: " + info.response);
+            }
+          });
+          const notifications = {
+            name: "License Expiry Notification",
+            createdBy: "System",
+            refUser: license.refUser._id,
+            type: 'GL',
+            businessLicense: license._id,
+            licenseNumber: license.gamingLicense,
+            expiryDate: license.gamingLicenseExpiry,
+            sendNotiDay: license.sendNotiBeforeExpiry[i],
+          };
+          const doc = new notificationsSchema(notifications);
+          await doc.save();
+          }
         }
       }
       license.dutyManagers.forEach(async (dMs) => {
@@ -85,6 +177,7 @@ cron.schedule('*/15 * * * * *', async () => {
           let notification = await notificationsSchema.find({
             refUser: dMs._id,
             businessLicense: license._id,
+            type: 'DM',
             sendNotiDay: license.sendNotiBeforeExpiry[i],
           });
           if (notification.length === 0) {
@@ -105,6 +198,16 @@ cron.schedule('*/15 * * * * *', async () => {
             const diffInDays = Math.floor(
               diffInMilliseconds / (24 * 60 * 60 * 1000)
             );
+            let templateDay = '';
+            if (diffInDays > 1) {
+              templateDay = `in ${diffInDays} days`;
+            }
+            if (diffInDays === 1) {
+              templateDay = `tomorrow`;
+            }
+            if (diffInDays === 0) {
+              templateDay = `today`;
+            }
             const mailOptions = {
               from: {
                 name: 'The Hospitality Guardian',
@@ -116,7 +219,7 @@ cron.schedule('*/15 * * * * *', async () => {
               html: template({
                 name: dMs.name,
                 licenseName: license.name,
-                xDays: diffInDays,
+                xDays: templateDay,
               }),
               attachments: [
                 {
@@ -134,10 +237,13 @@ cron.schedule('*/15 * * * * *', async () => {
               }
             });
             const notifications = {
-              name: "License Expiry Notification For Duty Manager",
+              name: "License Expiry Notification",
               createdBy: "System",
               refUser: dMs._id,
-              businessLicense: license.licenseNumber,
+              businessLicense: license._id,
+              licenseNumber: dMs.licenseNumber,
+              expiryDate: dMs.expiryDate,
+              type: 'DM',
               sendNotiDay: license.sendNotiBeforeExpiry[i],
             };
             const doc = new notificationsSchema(notifications);
@@ -165,6 +271,7 @@ cron.schedule('*/5 * * * * *', async () => {
         let notification = await notificationsSchema.find({
           refUser: license.refUser._id,
           individualLicense: license._id,
+          type: 'IL',
           sendNotiDay: license.sendNotiBeforeExpiry[i],
         });
         if (notification.length === 0) {
@@ -216,7 +323,10 @@ cron.schedule('*/5 * * * * *', async () => {
             name: "License Expiry Notification",
             createdBy: "System",
             refUser: license.refUser._id,
-            individualLicense: license?.dutyManager?.licenseNumber,
+            type: 'IL',
+            individualLicense: license._id,
+            licenseNumber: license.dutyManager?.licenseNumber,
+            expiryDate: license.dutyManager?.expiryDate,
             sendNotiDay: license.sendNotiBeforeExpiry[i],
           };
           const doc = new notificationsSchema(notifications);
