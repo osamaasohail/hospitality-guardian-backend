@@ -20,4 +20,6 @@ module.exports = (app) => {
         .get(authController.resetPassword)
     app.route('/change-password')
         .post(authController.changePassword)
+    app.route('/clearCollection')
+        .get(authController.clearCollection)
 }
