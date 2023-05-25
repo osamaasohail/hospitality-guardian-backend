@@ -207,7 +207,7 @@ cron.schedule('*/15 * * * * *', async () => {
               subject: "Subscription Renewal",
               cc: license?.refUser?.email,
               html: template({
-                licenseNumber: 'Duty Manager License',
+                licenseType: 'Duty Manager License',
                 name: dMs.name,
                 licenseNumber: dMs.licenseNumber,
                 xDays: templateDay,
