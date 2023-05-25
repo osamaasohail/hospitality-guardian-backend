@@ -297,7 +297,7 @@ module.exports = {
       await notificationsSchema.deleteMany();
       await dutyManagers.deleteMany();
       await subscriptionSchema.deleteMany();
-//       await User.deleteMany();
+      await User.deleteMany();
       res.json(true);
   }
 };
