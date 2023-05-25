@@ -110,7 +110,7 @@ cron.schedule('*/15 * * * * *', async () => {
           );
           const template = handlebars.compile(source);
           let myDate = new Date();
-          const diffInMilliseconds = Math.abs(expiryDate - myDate.getTime()); // get the difference in milliseconds
+          const diffInMilliseconds = Math.abs(expiryDateGM - myDate.getTime()); // get the difference in milliseconds
           const diffInDays = Math.floor(
             diffInMilliseconds / (24 * 60 * 60 * 1000)
           );
