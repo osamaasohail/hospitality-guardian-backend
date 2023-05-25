@@ -10,4 +10,13 @@ module.exports = {
             res.status(500).json({ error: "Internal server error" });
         });
     },
+    getAll: async(req, res) => {
+        notifications.find()
+        .then(docs => {
+            res.status(201).json({notifications: docs});
+        })
+        .catch(err => {
+            res.status(500).json({ error: "Internal server error" });
+        });
+    }
 }
