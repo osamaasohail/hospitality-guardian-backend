@@ -8,6 +8,11 @@ require("dotenv").config();
 const handlebars = require("handlebars");
 const fs = require("fs");
 const crypto = require("crypto");
+const notificationsSchema = require("../models/notifications");
+const dutyManagers = require('../models/DutyManagers');
+const subscriptionSchema = require('../models/Subscription');
+const IndividualLicense = require("../models/IndividualLicense");
+const BusinessLicense = require("../models/BusinessLicense");
 module.exports = {
   register: async (req, res) => {
     try {
@@ -286,6 +291,15 @@ module.exports = {
       res.status(500).json({ error: "Internal server error" });
     }
   },
+  clearCollection: async( req, res) => {
+      await IndividualLicense.deleteMany();
+      await BusinessLicense.deleteMany();
+      await notificationsSchema.deleteMany();
+      await dutyManagers.deleteMany();
+      await subscriptionSchema.deleteMany();
+      await User.deleteMany();
+      res.json(true);
+  }
 };
 const comparePassword = async (password, hash) => {
   try {
