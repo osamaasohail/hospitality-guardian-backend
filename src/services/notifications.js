@@ -59,8 +59,9 @@ cron.schedule('*/15 * * * * *', async () => {
             to: license.refUser.email,
             subject: "Subscription Renewal",
             html: template({
+              licenseType: 'Liquor License',
               name: license.refUser.name,
-              licenseName: license.licenseNumber,
+              licenseNumber: license.licenseNumber,
               xDays: templateDay,
             }),
             attachments: [
@@ -131,8 +132,9 @@ cron.schedule('*/15 * * * * *', async () => {
             to: license.refUser.email,
             subject: "Subscription Renewal",
             html: template({
+              licenseType: 'Gaming License',
               name: license.refUser.name,
-              licenseName: license.gamingLicense,
+              licenseNumber: license.gamingLicense,
               xDays: templateDay,
             }),
             attachments: [
@@ -205,8 +207,9 @@ cron.schedule('*/15 * * * * *', async () => {
               subject: "Subscription Renewal",
               cc: license?.refUser?.email,
               html: template({
+                licenseNumber: 'Duty Manager License',
                 name: dMs.name,
-                licenseName: dMs.licenseNumber,
+                licenseNumber: dMs.licenseNumber,
                 xDays: templateDay,
               }),
               attachments: [
@@ -293,8 +296,9 @@ cron.schedule('*/15 * * * * *', async () => {
             to: license.refUser.email,
             subject: "Subscription Renewal",
             html: template({
+              licenseType: 'License',
               name: license.refUser.name,
-              licenseName: license.dutyManager?.licenseNumber,
+              licenseNumber: license.dutyManager?.licenseNumber,
               xDays: templateDay,
             }),
             attachments: [
