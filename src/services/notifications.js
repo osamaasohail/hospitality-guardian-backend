@@ -92,165 +92,165 @@ cron.schedule('*/15 * * * * *', async () => {
           await doc.save();
         }
       }
-      if (license.isGamingLicenseEnabled) {
-        let expiryDateGM = new Date(license.gamingLicenseExpiry).getTime();
-        if (dateLicense.getTime() > expiryDateGM) {
-          let notification = await notificationsSchema.find({
-            refUser: license.refUser._id,
-            businessLicense: license._id,
-            type: 'GL',
-            sendNotiDay: license.sendNotiBeforeExpiry[i],
-          });
-          if (notification.length === 0) {
-            const transporter = nodemailer.createTransport({
-              service: "gmail",
-              auth: {
-                  user: process.env.EMAIL,
-                  pass: process.env.PASSWORD
-              }
-          });
-          const source = fs.readFileSync(
-            "src/templates/email-template-license.html",
-            "utf8"
-          );
-          const template = handlebars.compile(source);
-          let myDate = new Date();
-          const diffInMilliseconds = Math.abs(expiryDate - myDate.getTime()); // get the difference in milliseconds
-          const diffInDays = Math.floor(
-            diffInMilliseconds / (24 * 60 * 60 * 1000)
-          );
-          let templateDay = '';
-          if (diffInDays > 1) {
-            templateDay = `in ${diffInDays} days`;
-          }
-          if (diffInDays === 1) {
-            templateDay = `tomorrow`;
-          }
-          if (diffInDays === 0) {
-            templateDay = `today`;
-          }
-          const mailOptions = {
-            from: {
-              name: 'The Hospitality Guardian',
-              address: process.env.EMAIL
-            },
-            to: license.refUser.email,
-            subject: "Subscription Renewal",
-            html: template({
-              name: license.refUser.name,
-              licenseName: license.name,
-              xDays: templateDay,
-            }),
-            attachments: [
-              {
-                filename: "logo.png",
-                path: "src/templates/Email-Template.png",
-                cid: "unique@logo.png",
-              },
-            ],
-          };
-          transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-              console.log(error);
-            } else {
-              console.log("Email sent: " + info.response);
-            }
-          });
-          const notifications = {
-            name: "License Expiry Notification",
-            createdBy: "System",
-            refUser: license.refUser._id,
-            type: 'GL',
-            businessLicense: license._id,
-            licenseNumber: license.gamingLicense,
-            expiryDate: license.gamingLicenseExpiry,
-            sendNotiDay: license.sendNotiBeforeExpiry[i],
-          };
-          const doc = new notificationsSchema(notifications);
-          await doc.save();
-          }
-        }
-      }
-      license.dutyManagers.forEach(async (dMs) => {
-        let expiryDateDm = new Date(dMs.expiryDate).getTime();
-        if (dateLicense.getTime() > expiryDateDm) {
-          let notification = await notificationsSchema.find({
-            refUser: dMs._id,
-            businessLicense: license._id,
-            type: 'DM',
-            sendNotiDay: license.sendNotiBeforeExpiry[i],
-          });
-          if (notification.length === 0) {
-            const transporter = nodemailer.createTransport({
-                service: "gmail",
-                auth: {
-                    user: process.env.EMAIL,
-                    pass: process.env.PASSWORD
-                }
-            });
-            const source = fs.readFileSync(
-              "src/templates/email-template-license.html",
-              "utf8"
-            );
-            const template = handlebars.compile(source);
-            let myDate = new Date();
-            const diffInMilliseconds = Math.abs(expiryDateDm - myDate.getTime()); // get the difference in milliseconds
-            const diffInDays = Math.floor(
-              diffInMilliseconds / (24 * 60 * 60 * 1000)
-            );
-            let templateDay = '';
-            if (diffInDays > 1) {
-              templateDay = `in ${diffInDays} days`;
-            }
-            if (diffInDays === 1) {
-              templateDay = `tomorrow`;
-            }
-            if (diffInDays === 0) {
-              templateDay = `today`;
-            }
-            const mailOptions = {
-              from: {
-                name: 'The Hospitality Guardian',
-                address: process.env.EMAIL
-              },
-              to: `${dMs.email}`,
-              subject: "Subscription Renewal",
-              cc: license?.refUser?.email,
-              html: template({
-                name: dMs.name,
-                licenseName: license.name,
-                xDays: templateDay,
-              }),
-              attachments: [
-                {
-                  filename: "logo.png",
-                  path: "src/templates/Email-Template.png",
-                  cid: "unique@logo.png",
-                },
-              ],
-            };
-            transporter.sendMail(mailOptions, (error, info) => {
-              if (error) {
-                console.log(error);
-              } else {
-                console.log("Email sent: " + info.response);
-              }
-            });
-            const notifications = {
-              name: "License Expiry Notification",
-              createdBy: "System",
-              refUser: dMs._id,
-              businessLicense: license._id,
-              licenseNumber: dMs.licenseNumber,
-              expiryDate: dMs.expiryDate,
-              type: 'DM',
-              sendNotiDay: license.sendNotiBeforeExpiry[i],
-            };
-            const doc = new notificationsSchema(notifications);
-            await doc.save();
-          }
-        }
-      });
+//       if (license.isGamingLicenseEnabled) {
+//         let expiryDateGM = new Date(license.gamingLicenseExpiry).getTime();
+//         if (dateLicense.getTime() > expiryDateGM) {
+//           let notification = await notificationsSchema.find({
+//             refUser: license.refUser._id,
+//             businessLicense: license._id,
+//             type: 'GL',
+//             sendNotiDay: license.sendNotiBeforeExpiry[i],
+//           });
+//           if (notification.length === 0) {
+//             const transporter = nodemailer.createTransport({
+//               service: "gmail",
+//               auth: {
+//                   user: process.env.EMAIL,
+//                   pass: process.env.PASSWORD
+//               }
+//           });
+//           const source = fs.readFileSync(
+//             "src/templates/email-template-license.html",
+//             "utf8"
+//           );
+//           const template = handlebars.compile(source);
+//           let myDate = new Date();
+//           const diffInMilliseconds = Math.abs(expiryDate - myDate.getTime()); // get the difference in milliseconds
+//           const diffInDays = Math.floor(
+//             diffInMilliseconds / (24 * 60 * 60 * 1000)
+//           );
+//           let templateDay = '';
+//           if (diffInDays > 1) {
+//             templateDay = `in ${diffInDays} days`;
+//           }
+//           if (diffInDays === 1) {
+//             templateDay = `tomorrow`;
+//           }
+//           if (diffInDays === 0) {
+//             templateDay = `today`;
+//           }
+//           const mailOptions = {
+//             from: {
+//               name: 'The Hospitality Guardian',
+//               address: process.env.EMAIL
+//             },
+//             to: license.refUser.email,
+//             subject: "Subscription Renewal",
+//             html: template({
+//               name: license.refUser.name,
+//               licenseName: license.name,
+//               xDays: templateDay,
+//             }),
+//             attachments: [
+//               {
+//                 filename: "logo.png",
+//                 path: "src/templates/Email-Template.png",
+//                 cid: "unique@logo.png",
+//               },
+//             ],
+//           };
+//           transporter.sendMail(mailOptions, (error, info) => {
+//             if (error) {
+//               console.log(error);
+//             } else {
+//               console.log("Email sent: " + info.response);
+//             }
+//           });
+//           const notifications = {
+//             name: "License Expiry Notification",
+//             createdBy: "System",
+//             refUser: license.refUser._id,
+//             type: 'GL',
+//             businessLicense: license._id,
+//             licenseNumber: license.gamingLicense,
+//             expiryDate: license.gamingLicenseExpiry,
+//             sendNotiDay: license.sendNotiBeforeExpiry[i],
+//           };
+//           const doc = new notificationsSchema(notifications);
+//           await doc.save();
+//           }
+//         }
+//       }
+//       license.dutyManagers.forEach(async (dMs) => {
+//         let expiryDateDm = new Date(dMs.expiryDate).getTime();
+//         if (dateLicense.getTime() > expiryDateDm) {
+//           let notification = await notificationsSchema.find({
+//             refUser: dMs._id,
+//             businessLicense: license._id,
+//             type: 'DM',
+//             sendNotiDay: license.sendNotiBeforeExpiry[i],
+//           });
+//           if (notification.length === 0) {
+//             const transporter = nodemailer.createTransport({
+//                 service: "gmail",
+//                 auth: {
+//                     user: process.env.EMAIL,
+//                     pass: process.env.PASSWORD
+//                 }
+//             });
+//             const source = fs.readFileSync(
+//               "src/templates/email-template-license.html",
+//               "utf8"
+//             );
+//             const template = handlebars.compile(source);
+//             let myDate = new Date();
+//             const diffInMilliseconds = Math.abs(expiryDateDm - myDate.getTime()); // get the difference in milliseconds
+//             const diffInDays = Math.floor(
+//               diffInMilliseconds / (24 * 60 * 60 * 1000)
+//             );
+//             let templateDay = '';
+//             if (diffInDays > 1) {
+//               templateDay = `in ${diffInDays} days`;
+//             }
+//             if (diffInDays === 1) {
+//               templateDay = `tomorrow`;
+//             }
+//             if (diffInDays === 0) {
+//               templateDay = `today`;
+//             }
+//             const mailOptions = {
+//               from: {
+//                 name: 'The Hospitality Guardian',
+//                 address: process.env.EMAIL
+//               },
+//               to: `${dMs.email}`,
+//               subject: "Subscription Renewal",
+//               cc: license?.refUser?.email,
+//               html: template({
+//                 name: dMs.name,
+//                 licenseName: license.name,
+//                 xDays: templateDay,
+//               }),
+//               attachments: [
+//                 {
+//                   filename: "logo.png",
+//                   path: "src/templates/Email-Template.png",
+//                   cid: "unique@logo.png",
+//                 },
+//               ],
+//             };
+//             transporter.sendMail(mailOptions, (error, info) => {
+//               if (error) {
+//                 console.log(error);
+//               } else {
+//                 console.log("Email sent: " + info.response);
+//               }
+//             });
+//             const notifications = {
+//               name: "License Expiry Notification",
+//               createdBy: "System",
+//               refUser: dMs._id,
+//               businessLicense: license._id,
+//               licenseNumber: dMs.licenseNumber,
+//               expiryDate: dMs.expiryDate,
+//               type: 'DM',
+//               sendNotiDay: license.sendNotiBeforeExpiry[i],
+//             };
+//             const doc = new notificationsSchema(notifications);
+//             await doc.save();
+//           }
+//         }
+//       });
     }
   });
 });
