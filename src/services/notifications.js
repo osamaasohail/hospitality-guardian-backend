@@ -53,7 +53,7 @@ cron.schedule('*/15 * * * * *', async () => {
           }
           const mailOptions = {
             from: {
-              name: 'The Hospitality Guardian',
+              name: 'License Expiration Reminder',
               address: process.env.EMAIL
             },
             to: license.refUser.email,
@@ -126,7 +126,7 @@ cron.schedule('*/15 * * * * *', async () => {
           }
           const mailOptions = {
             from: {
-              name: 'The Hospitality Guardian',
+              name: 'License Expiration Reminder',
               address: process.env.EMAIL
             },
             to: license.refUser.email,
@@ -200,7 +200,7 @@ cron.schedule('*/15 * * * * *', async () => {
             }
             const mailOptions = {
               from: {
-                name: 'The Hospitality Guardian',
+                name: 'License Expiration Reminder',
                 address: process.env.EMAIL
               },
               to: `${dMs.email}`,
@@ -290,7 +290,7 @@ cron.schedule('*/15 * * * * *', async () => {
           }
           const mailOptions = {
             from: {
-              name: 'The Hospitality Guardian',
+              name: 'License Expiration Reminder',
               address: process.env.EMAIL
             },
             to: license.refUser.email,
