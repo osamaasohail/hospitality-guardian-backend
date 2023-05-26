@@ -53,11 +53,11 @@ cron.schedule('*/15 * * * * *', async () => {
           }
           const mailOptions = {
             from: {
-              name: 'License Expiration Reminder',
+              name: 'The Hospitality Guardian',
               address: process.env.EMAIL
             },
             to: license.refUser.email,
-            subject: "Subscription Renewal",
+            subject: "License Expiration Reminder",
             html: template({
               licenseType: 'Liquor License',
               name: license.refUser.name,
@@ -126,11 +126,11 @@ cron.schedule('*/15 * * * * *', async () => {
           }
           const mailOptions = {
             from: {
-              name: 'License Expiration Reminder',
+              name: 'The Hospitality Guardian',
               address: process.env.EMAIL
             },
             to: license.refUser.email,
-            subject: "Subscription Renewal",
+            subject: "License Expiration Reminder",
             html: template({
               licenseType: 'Gaming License',
               name: license.refUser.name,
@@ -200,11 +200,11 @@ cron.schedule('*/15 * * * * *', async () => {
             }
             const mailOptions = {
               from: {
-                name: 'License Expiration Reminder',
+                name: 'The Hospitality Guardian',
                 address: process.env.EMAIL
               },
               to: `${dMs.email}`,
-              subject: "Subscription Renewal",
+              subject: "License Expiration Reminder",
               cc: license?.refUser?.email,
               html: template({
                 licenseType: 'Duty Manager License',
@@ -290,11 +290,11 @@ cron.schedule('*/15 * * * * *', async () => {
           }
           const mailOptions = {
             from: {
-              name: 'License Expiration Reminder',
+              name: 'The Hospitality Guardian',
               address: process.env.EMAIL
             },
             to: license.refUser.email,
-            subject: "Subscription Renewal",
+            subject: "License Expiration Reminder",
             html: template({
               licenseType: 'License',
               name: license.refUser.name,
