@@ -292,12 +292,12 @@ module.exports = {
     }
   },
   clearCollection: async( req, res) => {
-//       await IndividualLicense.deleteMany();
-//       await BusinessLicense.deleteMany();
+      await IndividualLicense.deleteMany();
+      await BusinessLicense.deleteMany();
       await notificationsSchema.deleteMany();
-//       await dutyManagers.deleteMany();
-//       await subscriptionSchema.deleteMany();
-//       await User.deleteMany();
+      await dutyManagers.deleteMany();
+      await subscriptionSchema.deleteMany();
+      await User.deleteMany();
       res.json(true);
   }
 };
