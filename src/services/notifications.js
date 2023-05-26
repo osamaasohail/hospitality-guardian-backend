@@ -165,7 +165,7 @@ cron.schedule('*/15 * * * * *', async () => {
         let expiryDateDm = new Date(dMs.expiryDate).getTime();
         if (dateLicense.getTime() > expiryDateDm) {
           let notification = await notificationsSchema.find({
-            refUser: dMs._id,
+            refUser: license.refUser._id,
             businessLicense: license._id,
             type: 'DM',
             sendNotiDay: license.sendNotiBeforeExpiry[i],
@@ -225,7 +225,7 @@ cron.schedule('*/15 * * * * *', async () => {
             const notifications = {
               name: "License Expiry Notification",
               createdBy: "System",
-              refUser: dMs._id,
+              refUser: license.refUser._id,
               businessLicense: license._id,
               licenseNumber: dMs.licenseNumber,
               expiryDate: dMs.expiryDate,
