@@ -72,6 +72,9 @@ module.exports = {
               quantity: req.body.quantity,
               isNew: true,
             },
+            automatic_tax: {
+              enabled: true,
+            }
           });
 
           res.status(201).json({

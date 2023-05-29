@@ -46,6 +46,9 @@ module.exports = {
               isNew: true
             },
             mode: "subscription",
+            automatic_tax: {
+              enabled: true,
+            }
           });
           res
             .status(201)

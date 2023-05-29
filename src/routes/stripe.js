@@ -6,4 +6,5 @@ module.exports = (app) => {
   app.route("/webhook").post(stripeController.webhook);
   app.route("/subscription").get(authorize, stripeController.subscription);
   app.route("/test").get(stripeController.test);
+  app.route("/indd").get(stripeController.sessionTest);
 };

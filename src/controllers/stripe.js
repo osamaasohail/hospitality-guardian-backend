@@ -269,35 +269,41 @@ module.exports = {
   },
   sessionTest: async (req, res) => {
     try {
-      // const session = await stripe.checkout.sessions.create({
-      //   success_url: `${process.env.FRONTEND_URL}/profile/edit-profile`,
-      //   line_items: [
-      //     {
-      //       price: "price_1NAuaVB46Hybyi0D5LW4lIvs",
-      //       quantity: 1,
-      //     },
-      //   ],
-      //   mode: "subscription",
-      //   automatic_tax: {
-      //     enabled: true,
-      //   },
-      // });
-      // res.json({ url: session.url });
-      const updateSubscription = await stripe.subscriptions.update(
-        "sub_1NCoEsB46Hybyi0DkJR6wUop",
-        {
-          items: [
-            {
-              id: "si_NylmL6iY8ByMky",
-              quantity: 1,
-            }, {
-              id: "price_1NAuZiB46Hybyi0D6f0ND3sx",
-              quantity: 1,
-            }
-          ],
-        }
-      );
-      res.json({ updateSubscription });
+      const session = await stripe.checkout.sessions.create({
+        success_url: `${process.env.FRONTEND_URL}/profile/edit-profile`,
+        line_items: [
+          {
+            price: "price_1NAuYXB46Hybyi0DuS5AIL6r",
+            quantity: 1,
+          },{
+            price: "price_1NAuZiB46Hybyi0D6f0ND3sx",
+            quantity: 1,
+          },{
+            price: "price_1NAuaVB46Hybyi0D5LW4lIvs",
+            quantity: 1,
+          },
+        ],
+        mode: "subscription",
+        automatic_tax: {
+          enabled: true,
+        },
+      });
+      res.json({ url: session.url });
+      // const updateSubscription = await stripe.subscriptions.update(
+      //   "sub_1NCoEsB46Hybyi0DkJR6wUop",
+      //   {
+      //     items: [
+      //       {
+      //         id: "si_NylmL6iY8ByMky",
+      //         quantity: 1,
+      //       }, {
+      //         id: "price_1NAuZiB46Hybyi0D6f0ND3sx",
+      //         quantity: 1,
+      //       }
+      //     ],
+      //   }
+      // );
+      // res.json({ updateSubscription });
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: error });
