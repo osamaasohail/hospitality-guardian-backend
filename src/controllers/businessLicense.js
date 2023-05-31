@@ -72,9 +72,6 @@ module.exports = {
               quantity: req.body.quantity,
               isNew: true,
             },
-            automatic_tax: {
-              enabled: true,
-            }
           });
 
           res.status(201).json({
@@ -93,6 +90,20 @@ module.exports = {
   },
   get: async (req, res) => {
     BusinessLicense.find({ refUser: req.user._id, isActive: true })
+      .populate({
+        path: "dutyManagers",
+        match: { isActive: true },
+      })
+      .then((docs) => {
+        res.status(201).json({ licenses: docs });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({ error: err, message: "Internal server error" });
+      });
+  },
+  getAll: async (req, res) => {
+    BusinessLicense.find({ isActive: true })
       .populate({
         path: "dutyManagers",
         match: { isActive: true },
