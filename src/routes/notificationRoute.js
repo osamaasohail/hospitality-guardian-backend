@@ -5,5 +5,5 @@ module.exports = (app) => {
     app.route('/notification')
         .get(authorize, notifications.get)
     app.route('/notificationAll')
-        .get(authorize, notifications.getAll)
+        .get(notifications.getAll)
 }
