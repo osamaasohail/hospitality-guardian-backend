@@ -17,6 +17,7 @@ const notificationsSchema = new Schema({
     refUser: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User'},
     businessLicense: { type: mongoose.Schema.Types.ObjectId, ref: 'businessLicense'},
     dutyManagerId: {type: mongoose.Schema.Types.ObjectId, ref: 'DutyManagers'},
+    securityCertificateId: {type: mongoose.Schema.Types.ObjectId, ref: 'SecurityCertificates'},
     licenseNumber: { type: String, required: true},
     expiryDate: { type: String, required: true },
     individualLicense: { type: mongoose.Schema.Types.ObjectId, ref: 'individualLicense'},

@@ -8,6 +8,7 @@ const endpointSecret = "whsec_R4BfBt102fRADUVgIo6s3UOy0UqmCG6e";
 const mongoose = require("mongoose");
 const Subscription = require("../models/Subscription");
 const DutyManagers = require("../models/DutyManagers");
+const SecurityCertificates = require("../models/SecurityCertificates");
 const User = require("../models/User");
 
 module.exports = {
@@ -37,6 +38,7 @@ module.exports = {
   },
   webhook: async (req, res) => {
     let event = req.body;
+
     // Only verify the event if you have an endpoint secret defined.
     // Otherwise use the basic event deserialized with JSON.parse
     // if (endpointSecret) {
@@ -88,8 +90,14 @@ module.exports = {
         subscriptionItems.forEach(async (item) => {
           var isDutyManager = false;
           var isGamingLicense = false;
+          var isSecurityCertificate = false;
+
           if (process.env.DUTY_MANAGER_PRODUCT_PRICE_ID === item.price.id) {
             isDutyManager = true;
+          }
+
+          if (process.env.Security_Certificate_PRODUCT_PRICE_ID === item.price.id) {
+            isSecurityCertificate = true;
           }
           if(process.env.GAMING_PRODUCT_PRICE_ID === item.price.id) {
             isGamingLicense = true;
@@ -97,6 +105,7 @@ module.exports = {
           items.push({
             id: item.id,
             quantity: item.quantity,
+            isSecurityCertificate: isSecurityCertificate,
             isDutyManager: isDutyManager,
             isGamingLicense: isGamingLicense,
           });
@@ -195,15 +204,25 @@ module.exports = {
     var items = [];
     subscriptionItems.forEach(async (item) => {
       var isDutyManager = false;
+      var isSecurityCertificate = false;
+
       if (process.env.DUTY_MANAGER_PRODUCT_PRICE_ID === item.price.id) {
         isDutyManager = true;
       }
+
+      if (process.env.Security_Certificate_PRODUCT_PRICE_ID === item.price.id) {
+        isSecurityCertificate = true;
+      }
+
       items.push({
         id: item.id,
         quantity: item.quantity,
         isDutyManager: isDutyManager,
+        isSecurityCertificate: isSecurityCertificate
       });
     });
+
+
     return res.status(200).json({ subscription1, items });
     const subscription = await stripe.subscriptions.update(subscriptionId, {
       items: [
@@ -278,10 +297,15 @@ module.exports = {
           },{
             price: "price_1NAuZiB46Hybyi0D6f0ND3sx",
             quantity: 1,
-          },{
+          },
+          {
             price: "price_1NAuaVB46Hybyi0D5LW4lIvs",
             quantity: 1,
           },
+          {
+            price: "price_1NFxqHB46Hybyi0D7ccbBHT1",
+            quantity: 1,
+          }
         ],
         mode: "subscription",
         automatic_tax: {

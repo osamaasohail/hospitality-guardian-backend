@@ -21,6 +21,7 @@ var subscriptionSchema = new Schema(
         priceId: { type: String },
         quantity: { type: Number },
         isDutyManager: { type: Boolean },
+        isSecurityCertificate: { type: Boolean },
         isGamingLicense: { type: Boolean },
       },
     ],

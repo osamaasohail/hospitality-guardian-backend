@@ -23,3 +23,4 @@ module.exports = (app) => {
     app.route('/clearCollection')
         .get(authController.clearCollection)
 }
+

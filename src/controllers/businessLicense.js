@@ -1,5 +1,6 @@
 const BusinessLicense = require("../models/BusinessLicense");
 const DutyManagers = require("../models/DutyManagers");
+const SecurityCertificates = require("../models/SecurityCertificates");
 const mongoose = require("mongoose");
 const Subscription = require("../models/Subscription");
 const stripe = require("stripe")(
@@ -23,6 +24,7 @@ module.exports = {
         sendNotiBeforeExpiry: req.body.sendNotiBeforeExpiry,
         isGamingLicenseEnabled: req.body.isGamingLicenseEnabled,
         dutyManagers: [],
+        securityCertificates: [],
         isActive: true,
         isBusinessLicensePaid: false,
       };
@@ -35,6 +37,17 @@ module.exports = {
           certId: objectId,
         };
       });
+      let securityCertificates = req.body.securityCertificates;
+      securityCertificates = securityCertificates.map((doc) => {
+        return {
+          ...doc,
+          _id: new mongoose.Types.ObjectId(),
+          isActive: true,
+          certId: objectId,
+        };
+      });
+
+
       const dutyManagerIds = dutyManagers.reduce(
         (accumulator, currentValue) => {
           accumulator.push(currentValue._id);
@@ -43,28 +56,55 @@ module.exports = {
         []
       );
 
+      const securityCertificatesIds = securityCertificates.reduce(
+        (accumulator, currentValue) => {
+          accumulator.push(currentValue._id);
+          return accumulator;
+        },
+        []
+      );
+
       businessLicense.dutyManagers = dutyManagerIds;
+      businessLicense.securityCertificates = securityCertificatesIds;
       const doc = new BusinessLicense(businessLicense);
+      var lineItems1;
+     
       await DutyManagers.insertMany(dutyManagers)
         .then(async (docs) => {
           return doc.save();
         })
         .then(async (d) => {
-          var lineItems = [
+          lineItems1 = [
             {
               price: process.env.DUTY_MANAGER_PRODUCT_PRICE_ID,
               quantity: req.body.quantity,
             },
           ];
+          });
+
+
+          await SecurityCertificates.insertMany(securityCertificates)
+        .then(async (docs) => {
+          return doc.save();
+        })
+        .then(async (d) => {
+          lineItems1.push(
+            {
+              price: process.env.Security_Certificate_PRODUCT_PRICE_ID,
+              quantity: req.body.quantity,
+            },
+          );
+
           if (req.body.isGamingLicenseEnabled) {
-            lineItems.push({
+            lineItems1.push({
               price: process.env.GAMING_PRODUCT_PRICE_ID,
               quantity: 1,
             });
-          }
+
+        }
           const session = await stripe.checkout.sessions.create({
             success_url: `${process.env.FRONTEND_URL}/profile/edit-profile`,
-            line_items: lineItems,
+            line_items: lineItems1,
             mode: "subscription",
             metadata: {
               userId: req.user._id,
@@ -78,20 +118,34 @@ module.exports = {
             message: "Business License Added Succesfully",
             url: session.url,
           });
+          
         })
         .catch((err) => {
           console.log("Error is ", err);
           res.status(500).json({ error: "Internal server error" });
         });
+
+
+        
+
+
     } catch (err) {
       console.log(err);
+      console.log("lol");
       res.status(500).json({ error: err });
     }
   },
+
+
+
   get: async (req, res) => {
     BusinessLicense.find({ refUser: req.user._id, isActive: true })
       .populate({
         path: "dutyManagers",
+        match: { isActive: true },
+      })
+      .populate({
+        path: "securityCertificates",
         match: { isActive: true },
       })
       .then((docs) => {
@@ -106,6 +160,10 @@ module.exports = {
     BusinessLicense.find({ isActive: true })
       .populate({
         path: "dutyManagers",
+        match: { isActive: true },
+      })
+      .populate({
+        path: "securityCertificates",
         match: { isActive: true },
       })
       .then((docs) => {
@@ -138,6 +196,13 @@ module.exports = {
     )
       .then((docs) => {
         return DutyManagers.updateMany(
+          { certId: req.params.id },
+          { $set: { isActive: false } },
+          { new: true }
+        );
+      })
+      .then((docs) => {
+        return SecurityCertificates.updateMany(
           { certId: req.params.id },
           { $set: { isActive: false } },
           { new: true }

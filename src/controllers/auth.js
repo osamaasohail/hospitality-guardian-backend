@@ -10,6 +10,7 @@ const fs = require("fs");
 const crypto = require("crypto");
 const notificationsSchema = require("../models/notifications");
 const dutyManagers = require('../models/DutyManagers');
+const securityCer = require('../models/SecurityCertificates');
 const subscriptionSchema = require('../models/Subscription');
 const IndividualLicense = require("../models/IndividualLicense");
 const BusinessLicense = require("../models/BusinessLicense");
@@ -296,6 +297,7 @@ module.exports = {
       await BusinessLicense.deleteMany();
       await notificationsSchema.deleteMany();
       await dutyManagers.deleteMany();
+      await securityCer.deleteMany();
       await subscriptionSchema.deleteMany();
       await User.deleteMany();
       res.json(true);
