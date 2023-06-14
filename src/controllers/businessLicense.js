@@ -121,7 +121,7 @@ module.exports = {
           
         })
         .catch((err) => {
-          console.log("Error is ", err);
+          throw new Error(err);
           res.status(500).json({ error: "Internal server error" });
         });
 
