@@ -1,8 +1,11 @@
 const express = require("express");
 const router = express.Router();
 require("dotenv").config();
+// const stripe = require("stripe")(
+//   "sk_test_51Ml5u1B46Hybyi0DScxDrKlLM4qbLwekHUYEXRrmssqwhxS66rVFBGDSgYuU5GK5BBGBD3yHBfLZw27Q7NADMYV400ZlIIfSC3"
+// );
 const stripe = require("stripe")(
-  "sk_test_51Ml5u1B46Hybyi0DScxDrKlLM4qbLwekHUYEXRrmssqwhxS66rVFBGDSgYuU5GK5BBGBD3yHBfLZw27Q7NADMYV400ZlIIfSC3"
+  "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"
 );
 const endpointSecret = "whsec_R4BfBt102fRADUVgIo6s3UOy0UqmCG6e";
 const mongoose = require("mongoose");
