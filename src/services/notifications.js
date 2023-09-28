@@ -5,31 +5,37 @@ const fs = require("fs");
 const handlebars = require("handlebars");
 const nodemailer = require("nodemailer");
 const notificationsSchema = require("../models/notifications");
+
 // cron.schedule("0 */12 * * *", async () => {
-  // for business licenses
-cron.schedule('*/15 * * * * *', async () => {
+// for business licenses
+cron.schedule("*/15 * * * * *", async () => {
   console.log("for business licenses");
-  let licenses = await BusinessLicense.find().populate("refUser").populate('dutyManagers').populate('securityCertificates');
+  let licenses = await BusinessLicense.find()
+    .populate("refUser")
+    .populate("dutyManagers")
+    .populate("securityCertificates");
   console.log(licenses);
   licenses.forEach(async (license) => {
     let expiryDate = new Date(license.expiryDate).getTime();
     for (let i = 0; i < license.sendNotiBeforeExpiry.length; i++) {
       let dateLicense = new Date();
-      dateLicense.setDate(dateLicense.getDate() + license.sendNotiBeforeExpiry[i]);
+      dateLicense.setDate(
+        dateLicense.getDate() + license.sendNotiBeforeExpiry[i]
+      );
       if (dateLicense.getTime() > expiryDate) {
         let notification = await notificationsSchema.find({
           refUser: license.refUser._id,
           businessLicense: license._id,
-          type: 'BL',
+          type: "BL",
           sendNotiDay: license.sendNotiBeforeExpiry[i],
         });
         if (notification.length === 0) {
           const transporter = nodemailer.createTransport({
-              service: "gmail",
-              auth: {
-                  user: process.env.EMAIL,
-                  pass: process.env.PASSWORD
-              }
+            service: "gmail",
+            auth: {
+              user: process.env.EMAIL,
+              pass: process.env.PASSWORD,
+            },
           });
           const source = fs.readFileSync(
             "src/templates/email-template-license.html",
@@ -41,7 +47,7 @@ cron.schedule('*/15 * * * * *', async () => {
           const diffInDays = Math.floor(
             diffInMilliseconds / (24 * 60 * 60 * 1000)
           );
-          let templateDay = '';
+          let templateDay = "";
           if (diffInDays > 1) {
             templateDay = `in ${diffInDays} days`;
           }
@@ -53,13 +59,13 @@ cron.schedule('*/15 * * * * *', async () => {
           }
           const mailOptions = {
             from: {
-              name: 'The Hospitality Guardian',
-              address: process.env.EMAIL
+              name: "The Hospitality Guardian",
+              address: process.env.EMAIL,
             },
             to: license.refUser.email,
             subject: "License Expiration Reminder",
             html: template({
-              licenseType: 'Liquor License',
+              licenseType: "Liquor License",
               name: license.refUser.name,
               licenseNumber: license.licenseNumber,
               xDays: templateDay,
@@ -77,7 +83,7 @@ cron.schedule('*/15 * * * * *', async () => {
             name: "License Expiry Notification ",
             createdBy: "System",
             refUser: license.refUser._id,
-            type: 'BL',
+            type: "BL",
             licenseNumber: license.licenseNumber,
             businessLicense: license._id,
             expiryDate: license.expiryDate,
@@ -93,91 +99,16 @@ cron.schedule('*/15 * * * * *', async () => {
           let notification = await notificationsSchema.find({
             refUser: license.refUser._id,
             businessLicense: license._id,
-            type: 'GL',
+            type: "GL",
             sendNotiDay: license.sendNotiBeforeExpiry[i],
           });
           if (notification.length === 0) {
             const transporter = nodemailer.createTransport({
               service: "gmail",
               auth: {
-                  user: process.env.EMAIL,
-                  pass: process.env.PASSWORD
-              }
-          });
-          const source = fs.readFileSync(
-            "src/templates/email-template-license.html",
-            "utf8"
-          );
-          const template = handlebars.compile(source);
-          let myDate = new Date();
-          const diffInMilliseconds = Math.abs(expiryDateGM - myDate.getTime()); // get the difference in milliseconds
-          const diffInDays = Math.floor(
-            diffInMilliseconds / (24 * 60 * 60 * 1000)
-          );
-          let templateDay = '';
-          if (diffInDays > 1) {
-            templateDay = `in ${diffInDays} days`;
-          }
-          if (diffInDays === 1) {
-            templateDay = `tomorrow`;
-          }
-          if (diffInDays === 0) {
-            templateDay = `today`;
-          }
-          const mailOptions = {
-            from: {
-              name: 'The Hospitality Guardian',
-              address: process.env.EMAIL
-            },
-            to: license.refUser.email,
-            subject: "License Expiration Reminder",
-            html: template({
-              licenseType: 'Gaming License',
-              name: license.refUser.name,
-              licenseNumber: license.gamingLicense,
-              xDays: templateDay,
-            }),
-            attachments: [
-              {
-                filename: "logo.png",
-                path: "src/templates/Email-Template.png",
-                cid: "unique@logo.png",
+                user: process.env.EMAIL,
+                pass: process.env.PASSWORD,
               },
-            ],
-          };
-          await transporter.sendMail(mailOptions);
-          const notifications = {
-            name: "License Expiry Notification",
-            createdBy: "System",
-            refUser: license.refUser._id,
-            type: 'GL',
-            businessLicense: license._id,
-            licenseNumber: license.gamingLicense,
-            expiryDate: license.gamingLicenseExpiry,
-            sendNotiDay: license.sendNotiBeforeExpiry[i],
-          };
-          const doc = new notificationsSchema(notifications);
-          await doc.save();
-          }
-        }
-      }
-      license.dutyManagers.forEach(async (dMs) => {
-        let expiryDateDm = new Date(dMs.expiryDate).getTime();
-        if (dateLicense.getTime() > expiryDateDm) {
-          let notification = await notificationsSchema.find({
-            refUser: license.refUser._id,
-            dutyManagerId: dMs._id,
-            businessLicense: license._id,
-            type: 'DM',
-            sendNotiDay: license.sendNotiBeforeExpiry[i],
-          });
-          if (notification.length === 0) {
-            const transporter = nodemailer.createTransport({
-                service: "gmail",
-                auth: {
-                    user: process.env.EMAIL,
-                    pass: process.env.PASSWORD
-                }
             });
             const source = fs.readFileSync(
               "src/templates/email-template-license.html",
@@ -185,11 +116,13 @@ cron.schedule('*/15 * * * * *', async () => {
             );
             const template = handlebars.compile(source);
             let myDate = new Date();
-            const diffInMilliseconds = Math.abs(expiryDateDm - myDate.getTime()); // get the difference in milliseconds
+            const diffInMilliseconds = Math.abs(
+              expiryDateGM - myDate.getTime()
+            ); // get the difference in milliseconds
             const diffInDays = Math.floor(
               diffInMilliseconds / (24 * 60 * 60 * 1000)
             );
-            let templateDay = '';
+            let templateDay = "";
             if (diffInDays > 1) {
               templateDay = `in ${diffInDays} days`;
             }
@@ -201,14 +134,91 @@ cron.schedule('*/15 * * * * *', async () => {
             }
             const mailOptions = {
               from: {
-                name: 'The Hospitality Guardian',
-                address: process.env.EMAIL
+                name: "The Hospitality Guardian",
+                address: process.env.EMAIL,
+              },
+              to: license.refUser.email,
+              subject: "License Expiration Reminder",
+              html: template({
+                licenseType: "Gaming License",
+                name: license.refUser.name,
+                licenseNumber: license.gamingLicense,
+                xDays: templateDay,
+              }),
+              attachments: [
+                {
+                  filename: "logo.png",
+                  path: "src/templates/Email-Template.png",
+                  cid: "unique@logo.png",
+                },
+              ],
+            };
+            await transporter.sendMail(mailOptions);
+            const notifications = {
+              name: "License Expiry Notification",
+              createdBy: "System",
+              refUser: license.refUser._id,
+              type: "GL",
+              businessLicense: license._id,
+              licenseNumber: license.gamingLicense,
+              expiryDate: license.gamingLicenseExpiry,
+              sendNotiDay: license.sendNotiBeforeExpiry[i],
+            };
+            const doc = new notificationsSchema(notifications);
+            await doc.save();
+          }
+        }
+      }
+      license.dutyManagers.forEach(async (dMs) => {
+        let expiryDateDm = new Date(dMs.expiryDate).getTime();
+        if (dateLicense.getTime() > expiryDateDm) {
+          let notification = await notificationsSchema.find({
+            refUser: license.refUser._id,
+            dutyManagerId: dMs._id,
+            businessLicense: license._id,
+            type: "DM",
+            sendNotiDay: license.sendNotiBeforeExpiry[i],
+          });
+          if (notification.length === 0) {
+            const transporter = nodemailer.createTransport({
+              service: "gmail",
+              auth: {
+                user: process.env.EMAIL,
+                pass: process.env.PASSWORD,
+              },
+            });
+            const source = fs.readFileSync(
+              "src/templates/email-template-license.html",
+              "utf8"
+            );
+            const template = handlebars.compile(source);
+            let myDate = new Date();
+            const diffInMilliseconds = Math.abs(
+              expiryDateDm - myDate.getTime()
+            ); // get the difference in milliseconds
+            const diffInDays = Math.floor(
+              diffInMilliseconds / (24 * 60 * 60 * 1000)
+            );
+            let templateDay = "";
+            if (diffInDays > 1) {
+              templateDay = `in ${diffInDays} days`;
+            }
+            if (diffInDays === 1) {
+              templateDay = `tomorrow`;
+            }
+            if (diffInDays === 0) {
+              templateDay = `today`;
+            }
+            const mailOptions = {
+              from: {
+                name: "The Hospitality Guardian",
+                address: process.env.EMAIL,
               },
               to: `${dMs.email}`,
               subject: "License Expiration Reminder",
               cc: license?.refUser?.email,
               html: template({
-                licenseType: 'Duty Manager License',
+                licenseType: "Duty Manager License",
                 name: dMs.name,
                 licenseNumber: dMs.licenseNumber,
                 xDays: templateDay,
@@ -231,7 +241,7 @@ cron.schedule('*/15 * * * * *', async () => {
               dutyManagerId: dMs._id,
               licenseNumber: dMs.licenseNumber,
               expiryDate: dMs.expiryDate,
-              type: 'DM',
+              type: "DM",
               sendNotiDay: license.sendNotiBeforeExpiry[i],
             };
             const doc = new notificationsSchema(notifications);
@@ -247,16 +257,16 @@ cron.schedule('*/15 * * * * *', async () => {
             refUser: license.refUser._id,
             securityCertificateId: dMs._id,
             businessLicense: license._id,
-            type: 'SC',
+            type: "SC",
             sendNotiDay: license.sendNotiBeforeExpiry[i],
           });
           if (notification.length === 0) {
             const transporter = nodemailer.createTransport({
-                service: "gmail",
-                auth: {
-                    user: process.env.EMAIL,
-                    pass: process.env.PASSWORD
-                }
+              service: "gmail",
+              auth: {
+                user: process.env.EMAIL,
+                pass: process.env.PASSWORD,
+              },
             });
             const source = fs.readFileSync(
               "src/templates/email-template-license.html",
@@ -264,11 +274,13 @@ cron.schedule('*/15 * * * * *', async () => {
             );
             const template = handlebars.compile(source);
             let myDate = new Date();
-            const diffInMilliseconds = Math.abs(expiryDateDm - myDate.getTime()); // get the difference in milliseconds
+            const diffInMilliseconds = Math.abs(
+              expiryDateDm - myDate.getTime()
+            ); // get the difference in milliseconds
             const diffInDays = Math.floor(
               diffInMilliseconds / (24 * 60 * 60 * 1000)
             );
-            let templateDay = '';
+            let templateDay = "";
             if (diffInDays > 1) {
               templateDay = `in ${diffInDays} days`;
             }
@@ -280,14 +292,14 @@ cron.schedule('*/15 * * * * *', async () => {
             }
             const mailOptions = {
               from: {
-                name: 'The Hospitality Guardian',
-                address: process.env.EMAIL
+                name: "The Hospitality Guardian",
+                address: process.env.EMAIL,
               },
               to: `${dMs.email}`,
               subject: "License Expiration Reminder",
               cc: license?.refUser?.email,
               html: template({
-                licenseType: 'Security Certificate License',
+                licenseType: "Security Certificate License",
                 name: dMs.name,
                 licenseNumber: dMs.licenseNumber,
                 xDays: templateDay,
@@ -310,7 +322,7 @@ cron.schedule('*/15 * * * * *', async () => {
               securityCertificateId: dMs._id,
               licenseNumber: dMs.licenseNumber,
               expiryDate: dMs.expiryDate,
-              type: 'SC',
+              type: "SC",
               sendNotiDay: license.sendNotiBeforeExpiry[i],
             };
             const doc = new notificationsSchema(notifications);
@@ -321,8 +333,8 @@ cron.schedule('*/15 * * * * *', async () => {
     }
   });
 });
-cron.schedule('*/15 * * * * *', async () => {
-// cron.schedule("0 */12 * * *", async () => {
+cron.schedule("*/15 * * * * *", async () => {
+  // cron.schedule("0 */12 * * *", async () => {
   // for individual licenses
   console.log("for individual licenses");
   let licenses = await IndividualLicense.find()
@@ -338,7 +350,7 @@ cron.schedule('*/15 * * * * *', async () => {
         let notification = await notificationsSchema.find({
           refUser: license.refUser._id,
           individualLicense: license._id,
-          type: 'IL',
+          type: "IL",
           sendNotiDay: license.sendNotiBeforeExpiry[i],
         });
         if (notification.length === 0) {
@@ -359,7 +371,7 @@ cron.schedule('*/15 * * * * *', async () => {
           const diffInDays = Math.floor(
             diffInMilliseconds / (24 * 60 * 60 * 1000)
           );
-          let templateDay = '';
+          let templateDay = "";
           if (diffInDays > 1) {
             templateDay = `in ${diffInDays} days`;
           }
@@ -371,13 +383,13 @@ cron.schedule('*/15 * * * * *', async () => {
           }
           const mailOptions = {
             from: {
-              name: 'The Hospitality Guardian',
-              address: process.env.EMAIL
+              name: "The Hospitality Guardian",
+              address: process.env.EMAIL,
             },
             to: license.refUser.email,
             subject: "License Expiration Reminder",
             html: template({
-              licenseType: 'License',
+              licenseType: "License",
               name: license.refUser.name,
               licenseNumber: license.dutyManager?.licenseNumber,
               xDays: templateDay,
@@ -395,7 +407,7 @@ cron.schedule('*/15 * * * * *', async () => {
             name: "License Expiry Notification",
             createdBy: "System",
             refUser: license.refUser._id,
-            type: 'IL',
+            type: "IL",
             individualLicense: license._id,
             licenseNumber: license.dutyManager?.licenseNumber,
             expiryDate: license.dutyManager?.expiryDate,
@@ -409,90 +421,90 @@ cron.schedule('*/15 * * * * *', async () => {
   });
 });
 
-cron.schedule('*/15 * * * * *', async () => {
+cron.schedule("*/15 * * * * *", async () => {
   // cron.schedule("0 */12 * * *", async () => {
-    // for individual licenses
-    console.log("for individual licenses");
-    let licenses = await IndividualLicense.find()
-      .populate("refUser")
-      .populate("securityCertificate");
-    console.log("IND Licnese : ", licenses);
-    licenses.forEach(async (license) => {
-      let expiryDate = new Date(license.securityCertificate.expiryDate).getTime();
-      for (let i = 0; i < license.sendNotiBeforeExpiry.length; i++) {
-        let date = new Date();
-        date.setDate(date.getDate() + license.sendNotiBeforeExpiry[i]);
-        if (date.getTime() > expiryDate) {
-          let notification = await notificationsSchema.find({
-            refUser: license.refUser._id,
-            individualLicense: license._id,
-            type: 'IL',
-            sendNotiDay: license.sendNotiBeforeExpiry[i],
+  // for individual licenses
+  console.log("for individual licenses");
+  let licenses = await IndividualLicense.find()
+    .populate("refUser")
+    .populate("securityCertificate");
+  console.log("IND Licnese : ", licenses);
+  licenses.forEach(async (license) => {
+    let expiryDate = new Date(license.securityCertificate.expiryDate).getTime();
+    for (let i = 0; i < license.sendNotiBeforeExpiry.length; i++) {
+      let date = new Date();
+      date.setDate(date.getDate() + license.sendNotiBeforeExpiry[i]);
+      if (date.getTime() > expiryDate) {
+        let notification = await notificationsSchema.find({
+          refUser: license.refUser._id,
+          individualLicense: license._id,
+          type: "IL",
+          sendNotiDay: license.sendNotiBeforeExpiry[i],
+        });
+        if (notification.length === 0) {
+          const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+              user: process.env.EMAIL,
+              pass: process.env.PASSWORD,
+            },
           });
-          if (notification.length === 0) {
-            const transporter = nodemailer.createTransport({
-              service: "gmail",
-              auth: {
-                user: process.env.EMAIL,
-                pass: process.env.PASSWORD,
-              },
-            });
-            const source = fs.readFileSync(
-              "src/templates/email-template-license.html",
-              "utf8"
-            );
-            const template = handlebars.compile(source);
-            let myDate = new Date();
-            const diffInMilliseconds = Math.abs(expiryDate - myDate.getTime()); // get the difference in milliseconds
-            const diffInDays = Math.floor(
-              diffInMilliseconds / (24 * 60 * 60 * 1000)
-            );
-            let templateDay = '';
-            if (diffInDays > 1) {
-              templateDay = `in ${diffInDays} days`;
-            }
-            if (diffInDays === 1) {
-              templateDay = `tomorrow`;
-            }
-            if (diffInDays === 0) {
-              templateDay = `today`;
-            }
-            const mailOptions = {
-              from: {
-                name: 'The Hospitality Guardian',
-                address: process.env.EMAIL
-              },
-              to: license.refUser.email,
-              subject: "License Expiration Reminder",
-              html: template({
-                licenseType: 'License',
-                name: license.refUser.name,
-                licenseNumber: license.securityCertificate?.licenseNumber,
-                xDays: templateDay,
-              }),
-              attachments: [
-                {
-                  filename: "logo.png",
-                  path: "src/templates/Email-Template.png",
-                  cid: "unique@logo.png",
-                },
-              ],
-            };
-            await transporter.sendMail(mailOptions);
-            const notifications = {
-              name: "License Expiry Notification",
-              createdBy: "System",
-              refUser: license.refUser._id,
-              type: 'IL',
-              individualLicense: license._id,
-              licenseNumber: license.securityCertificate?.licenseNumber,
-              expiryDate: license.securityCertificate?.expiryDate,
-              sendNotiDay: license.sendNotiBeforeExpiry[i],
-            };
-            const doc = new notificationsSchema(notifications);
-            await doc.save();
+          const source = fs.readFileSync(
+            "src/templates/email-template-license.html",
+            "utf8"
+          );
+          const template = handlebars.compile(source);
+          let myDate = new Date();
+          const diffInMilliseconds = Math.abs(expiryDate - myDate.getTime()); // get the difference in milliseconds
+          const diffInDays = Math.floor(
+            diffInMilliseconds / (24 * 60 * 60 * 1000)
+          );
+          let templateDay = "";
+          if (diffInDays > 1) {
+            templateDay = `in ${diffInDays} days`;
           }
+          if (diffInDays === 1) {
+            templateDay = `tomorrow`;
+          }
+          if (diffInDays === 0) {
+            templateDay = `today`;
+          }
+          const mailOptions = {
+            from: {
+              name: "The Hospitality Guardian",
+              address: process.env.EMAIL,
+            },
+            to: license.refUser.email,
+            subject: "License Expiration Reminder",
+            html: template({
+              licenseType: "License",
+              name: license.refUser.name,
+              licenseNumber: license.securityCertificate?.licenseNumber,
+              xDays: templateDay,
+            }),
+            attachments: [
+              {
+                filename: "logo.png",
+                path: "src/templates/Email-Template.png",
+                cid: "unique@logo.png",
+              },
+            ],
+          };
+          await transporter.sendMail(mailOptions);
+          const notifications = {
+            name: "License Expiry Notification",
+            createdBy: "System",
+            refUser: license.refUser._id,
+            type: "IL",
+            individualLicense: license._id,
+            licenseNumber: license.securityCertificate?.licenseNumber,
+            expiryDate: license.securityCertificate?.expiryDate,
+            sendNotiDay: license.sendNotiBeforeExpiry[i],
+          };
+          const doc = new notificationsSchema(notifications);
+          await doc.save();
         }
       }
-    });
+    }
   });
+});
