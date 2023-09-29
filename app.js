@@ -37,7 +37,7 @@ process.on("uncaughtException", (err) => {
 // };
 app.use(logger("dev"));
 app.use(express.json());
-const port = process.env.PORT || "4000";
+const port = process.env.PORT || "3000";
 app.use(express.urlencoded({ extended: false }));
 const connectWithRetry = () => {
   mongoose
