@@ -19,7 +19,7 @@ process.on("uncaughtException", (err) => {
   process.exit(1);
 });
 const https = require("https");
-Certificate;
+//Certificate
 const privateKey = fs.readFileSync(
   "/home/ubuntu/proj/backend/private.key",
   "utf8"
