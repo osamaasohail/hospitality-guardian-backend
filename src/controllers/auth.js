@@ -9,9 +9,9 @@ const handlebars = require("handlebars");
 const fs = require("fs");
 const crypto = require("crypto");
 const notificationsSchema = require("../models/notifications");
-const dutyManagers = require('../models/DutyManagers');
-const securityCer = require('../models/SecurityCertificates');
-const subscriptionSchema = require('../models/Subscription');
+const dutyManagers = require("../models/DutyManagers");
+const securityCer = require("../models/SecurityCertificates");
+const subscriptionSchema = require("../models/Subscription");
 const IndividualLicense = require("../models/IndividualLicense");
 const BusinessLicense = require("../models/BusinessLicense");
 module.exports = {
@@ -41,11 +41,11 @@ module.exports = {
       let myNewUser = await user.save();
       // Send a verification email to the user
       const transporter = nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-              user: process.env.EMAIL,
-              pass: process.env.PASSWORD,
-          },
+        service: "gmail",
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.PASSWORD,
+        },
       });
       // const transporter = nodemailer.createTransport({
       //   host: process.env.HOST,
@@ -66,8 +66,8 @@ module.exports = {
       }/verify-email/${myNewUser._id.toString()}?token=${verificationToken}`;
       const mailOptions = {
         from: {
-          name: 'The Hospitality Guardian',
-          address: process.env.EMAIL
+          name: "The Hospitality Guardian",
+          address: process.env.EMAIL,
         },
         to: email,
         subject: "Email Verification",
@@ -116,9 +116,9 @@ module.exports = {
       }
 
       const token = user.generateAuthToken();
-      if(!user?.isVerified) {
+      if (!user?.isVerified) {
         return res.status(400).json({
-          message: "Email not verified"
+          message: "Email not verified",
         });
       }
       res.status(201).json({
@@ -178,7 +178,27 @@ module.exports = {
             { _id: req.params.id },
             { $set: { isVerified: true } }
           );
-          res.status(201).json({ message: "Successfully Verified User" });
+          const htmlResponse = `
+          <html>
+            <head>
+              <title>Email Verification Success</title>
+            </head>
+            <body>
+              <h1>Email Successfully Verified! Will be automatically redirected in 3 seconds...</h1>
+              <script>
+                // Redirect to another URL after 3 seconds (3000 milliseconds)
+                setTimeout(function() {
+                  window.location.href = "https://hospitalityguardian.co.nz/sign-in"; // Replace with your desired URL
+                }, 3000);
+              </script>
+            </body>
+          </html>
+        `;
+
+          // Set the Content-Type header to indicate that the response contains HTML
+          res.setHeader("Content-Type", "text/html");
+          // Send the HTML response to the client
+          res.status(200).send(htmlResponse);
         }
       }
     } catch (error) {
@@ -204,13 +224,13 @@ module.exports = {
       await user.save();
       const link = `${process.env.FRONTEND_URL}/profile/reset-password?token=${resetToken}`;
       console.log("Link is " + link);
-        const transporter = nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-            user: process.env.EMAIL,
-            pass: process.env.PASSWORD,
-          },
-        });
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.PASSWORD,
+        },
+      });
       // const transporter = nodemailer.createTransport({
       //   host: process.env.HOST,
       //   port: 587,
@@ -227,8 +247,8 @@ module.exports = {
       const template = handlebars.compile(source);
       const mailOptions = {
         from: {
-          name: 'The Hospitality Guardian',
-          address: process.env.EMAIL
+          name: "The Hospitality Guardian",
+          address: process.env.EMAIL,
         },
         to: email,
         subject: "Reset Your Password",
@@ -292,16 +312,16 @@ module.exports = {
       res.status(500).json({ error: "Internal server error" });
     }
   },
-  clearCollection: async( req, res) => {
-      await IndividualLicense.deleteMany();
-      await BusinessLicense.deleteMany();
-      await notificationsSchema.deleteMany();
-      await dutyManagers.deleteMany();
-      await securityCer.deleteMany();
-      await subscriptionSchema.deleteMany();
-      await User.deleteMany();
-      res.json(true);
-  }
+  clearCollection: async (req, res) => {
+    await IndividualLicense.deleteMany();
+    await BusinessLicense.deleteMany();
+    await notificationsSchema.deleteMany();
+    await dutyManagers.deleteMany();
+    await securityCer.deleteMany();
+    await subscriptionSchema.deleteMany();
+    await User.deleteMany();
+    res.json(true);
+  },
 };
 const comparePassword = async (password, hash) => {
   try {
