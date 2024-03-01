@@ -41,15 +41,16 @@ module.exports = {
         };
       });
       let securityCertificates = req.body.securityCertificates;
-      securityCertificates = securityCertificates.map((doc) => {
-        return {
-          ...doc,
-          _id: new mongoose.Types.ObjectId(),
-          isActive: true,
-          certId: objectId,
-        };
-      });
 
+      securityCertificates = securityCertificates.map((doc) => {
+        if (doc?.name !== "" && doc?.email !== "" && doc?.licenseNumber !== "")
+          return {
+            ...doc,
+            _id: new mongoose.Types.ObjectId(),
+            isActive: true,
+            certId: objectId,
+          };
+      });
 
       const dutyManagerIds = dutyManagers.reduce(
         (accumulator, currentValue) => {
@@ -59,19 +60,18 @@ module.exports = {
         []
       );
 
-      const securityCertificatesIds = securityCertificates.reduce(
-        (accumulator, currentValue) => {
-          accumulator.push(currentValue._id);
+      const securityCertificatesIds =
+        securityCertificates?.length > 0 &&
+        securityCertificates.reduce((accumulator, currentValue) => {
+          accumulator.push(currentValue?._id);
           return accumulator;
-        },
-        []
-      );
+        }, []);
 
       businessLicense.dutyManagers = dutyManagerIds;
       businessLicense.securityCertificates = securityCertificatesIds;
       const doc = new BusinessLicense(businessLicense);
       var lineItems1;
-     
+
       await DutyManagers.insertMany(dutyManagers)
         .then(async (docs) => {
           return doc.save();
@@ -83,28 +83,24 @@ module.exports = {
               quantity: req.body.quantity,
             },
           ];
-          });
+        });
 
-
-          await SecurityCertificates.insertMany(securityCertificates)
+      await SecurityCertificates.insertMany(securityCertificates)
         .then(async (docs) => {
           return doc.save();
         })
         .then(async (d) => {
-          lineItems1.push(
-            {
-              price: process.env.Security_Certificate_PRODUCT_PRICE_ID,
-              quantity: req.body.quantity,
-            },
-          );
+          lineItems1.push({
+            price: process.env.Security_Certificate_PRODUCT_PRICE_ID,
+            quantity: req.body.quantity,
+          });
 
           if (req.body.isGamingLicenseEnabled) {
             lineItems1.push({
               price: process.env.GAMING_PRODUCT_PRICE_ID,
               quantity: 1,
             });
-
-        }
+          }
           const session = await stripe.checkout.sessions.create({
             success_url: `${process.env.FRONTEND_URL}/profile/edit-profile`,
             line_items: lineItems1,
@@ -121,25 +117,16 @@ module.exports = {
             message: "Business License Added Succesfully",
             url: session.url,
           });
-          
         })
         .catch((err) => {
           throw new Error(err);
           res.status(500).json({ error: "Internal server error" });
         });
-
-
-        
-
-
     } catch (err) {
       console.log(err);
-      console.log("lol");
       res.status(500).json({ error: err });
     }
   },
-
-
 
   get: async (req, res) => {
     BusinessLicense.find({ refUser: req.user._id, isActive: true })
@@ -223,11 +210,13 @@ module.exports = {
   deleteGamingLicense: async (req, res) => {
     BusinessLicense.updateOne(
       { refUser: req.user._id },
-      { $set: {isGamingLicenseEnabled: false} },
+      { $set: { isGamingLicenseEnabled: false } },
       { new: true }
     )
       .then(async (updatedDocument) => {
-        let subscription = await Subscription.findOne({ refUser: req.user._id });
+        let subscription = await Subscription.findOne({
+          refUser: req.user._id,
+        });
         if (subscription) {
           const filteredItems = subscription?.subscriptionItems?.filter(
             (item) => item.isGamingLicense === true
@@ -305,5 +294,5 @@ module.exports = {
         console.log(err);
         res.status(500).json({ error: err, message: "Internal server error" });
       });
-  }
+  },
 };
