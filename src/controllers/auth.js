@@ -47,15 +47,6 @@ module.exports = {
           pass: process.env.PASSWORD,
         },
       });
-      // const transporter = nodemailer.createTransport({
-      //   host: process.env.HOST,
-      //   port: 587,
-      //   secure: false, // Set to true if you're using a secure connection (TLS/SSL)
-      //   auth: {
-      //     user: process.env.EMAIL, // Replace with your email address
-      //     pass: process.env.PASSWORD, // Replace with your email password or an app-specific password
-      //   },
-      // });
       const source = fs.readFileSync(
         "src/templates/email-template-verification.html",
         "utf8"
@@ -117,8 +108,46 @@ module.exports = {
 
       const token = user.generateAuthToken();
       if (!user?.isVerified) {
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.EMAIL,
+            pass: process.env.PASSWORD,
+          },
+        });
+        const source = fs.readFileSync(
+          "src/templates/email-template-verification.html",
+          "utf8"
+        );
+        const template = handlebars.compile(source);
+        let link = `${
+          process.env.BASE_URL
+        }/verify-email/${user._id.toString()}?token=${user.verificationToken}`;
+        const mailOptions = {
+          from: {
+            name: "The Hospitality Guardian",
+            address: process.env.EMAIL,
+          },
+          to: email,
+          subject: "Email Verification",
+          html: template({ name: user.name, link: link }),
+          attachments: [
+            {
+              filename: "logo.png",
+              path: "src/templates/Email-Template.png",
+              cid: "unique@logo.png",
+            },
+          ],
+        };
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Email sent: " + info.response);
+          }
+        });
         return res.status(400).json({
-          message: "Email not verified",
+          message: "Email not verified! verification link Sent to your email",
         });
       }
       res.status(201).json({
