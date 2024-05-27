@@ -18,23 +18,23 @@ process.on("uncaughtException", (err) => {
   console.error("Uncaught exception:", err);
   process.exit(1);
 });
-// const https = require("https");
-// //Certificate
-// const privateKey = fs.readFileSync(
-//   "/home/ubuntu/proj/backend/private.key",
-//   "utf8"
-// );
-// const certificate = fs.readFileSync(
-//   "/home/ubuntu/proj/backend/certificate.crt",
-//   "utf8"
-// );
-// const ca = fs.readFileSync("/home/ubuntu/proj/backend/ca_bundle.crt", "utf8");
+const https = require("https");
+//Certificate
+const privateKey = fs.readFileSync(
+  "/home/ubuntu/proj/backend/private.key",
+  "utf8"
+);
+const certificate = fs.readFileSync(
+  "/home/ubuntu/proj/backend/certificate.crt",
+  "utf8"
+);
+const ca = fs.readFileSync("/home/ubuntu/proj/backend/ca_bundle.crt", "utf8");
 
-// const credentials = {
-//   key: privateKey,
-//   cert: certificate,
-//   ca: ca,
-// };
+const credentials = {
+  key: privateKey,
+  cert: certificate,
+  ca: ca,
+};
 app.use(logger("dev"));
 app.use(express.json());
 const port = process.env.PORT || "3000";
@@ -88,7 +88,7 @@ app.use((req, res, next) => {
   next(createError(404));
 });
 
-// const httpsServer = https.createServer(credentials, app);
-app.listen(4000, () => {
+const httpsServer = https.createServer(credentials, app);
+httpsServer.listen(4000, () => {
   console.log("HTTPS Server running on port 443");
 });
