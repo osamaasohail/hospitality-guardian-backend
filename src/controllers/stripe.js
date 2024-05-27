@@ -5,7 +5,7 @@ require("dotenv").config();
 //   "sk_test_51Ml5u1B46Hybyi0DScxDrKlLM4qbLwekHUYEXRrmssqwhxS66rVFBGDSgYuU5GK5BBGBD3yHBfLZw27Q7NADMYV400ZlIIfSC3"
 // );
 const stripe = require("stripe")(
-  "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"
+  "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"
 );
 const endpointSecret = "whsec_R4BfBt102fRADUVgIo6s3UOy0UqmCG6e";
 const mongoose = require("mongoose");
@@ -99,10 +99,12 @@ module.exports = {
             isDutyManager = true;
           }
 
-          if (process.env.Security_Certificate_PRODUCT_PRICE_ID === item.price.id) {
+          if (
+            process.env.Security_Certificate_PRODUCT_PRICE_ID === item.price.id
+          ) {
             isSecurityCertificate = true;
           }
-          if(process.env.GAMING_PRODUCT_PRICE_ID === item.price.id) {
+          if (process.env.GAMING_PRODUCT_PRICE_ID === item.price.id) {
             isGamingLicense = true;
           }
           items.push({
@@ -184,13 +186,11 @@ module.exports = {
         (sum, item) => sum + item.quantity,
         0
       );
-      return res
-        .status(200)
-        .json({
-          nextInvoicePrice: upcomingInvoice?.amount_due/100,
-          nextInvoiceDate: subscription?.current_period_end,
-          totalQuantity: totalQuantity,
-        });
+      return res.status(200).json({
+        nextInvoicePrice: upcomingInvoice?.amount_due / 100,
+        nextInvoiceDate: subscription?.current_period_end,
+        totalQuantity: totalQuantity,
+      });
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: "Internal server error" });
@@ -221,10 +221,9 @@ module.exports = {
         id: item.id,
         quantity: item.quantity,
         isDutyManager: isDutyManager,
-        isSecurityCertificate: isSecurityCertificate
+        isSecurityCertificate: isSecurityCertificate,
       });
     });
-
 
     return res.status(200).json({ subscription1, items });
     const subscription = await stripe.subscriptions.update(subscriptionId, {
@@ -297,7 +296,8 @@ module.exports = {
           {
             price: "price_1NAuYXB46Hybyi0DuS5AIL6r",
             quantity: 1,
-          },{
+          },
+          {
             price: "price_1NAuZiB46Hybyi0D6f0ND3sx",
             quantity: 1,
           },
@@ -308,7 +308,7 @@ module.exports = {
           {
             price: "price_1NFxqHB46Hybyi0D7ccbBHT1",
             quantity: 1,
-          }
+          },
         ],
         mode: "subscription",
         automatic_tax: {

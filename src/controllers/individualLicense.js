@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 //   "sk_test_51Ml5u1B46Hybyi0DScxDrKlLM4qbLwekHUYEXRrmssqwhxS66rVFBGDSgYuU5GK5BBGBD3yHBfLZw27Q7NADMYV400ZlIIfSC3"
 // );
 const stripe = require("stripe")(
-  "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"
+  "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"
 );
 require("dotenv").config();
 
@@ -46,19 +46,17 @@ module.exports = {
               userId: req.user._id,
               type: "individualLicense",
               quantity: 1,
-              isNew: true
+              isNew: true,
             },
             mode: "subscription",
             automatic_tax: {
               enabled: true,
-            }
+            },
           });
-          res
-            .status(201)
-            .json({
-              message: "Individual License Added Succesfully",
-              url: session.url,
-            });
+          res.status(201).json({
+            message: "Individual License Added Succesfully",
+            url: session.url,
+          });
         })
         .catch((err) => {
           console.log(err);
@@ -117,6 +115,7 @@ module.exports = {
           .json({ message: "Individual License Deleted Succesfully" });
       })
       .catch((err) => {
+        console.log(err);
         res.status(500).json({ error: "Internal server error" });
       });
   },

@@ -7,7 +7,7 @@ const { log } = require("handlebars");
 //   "sk_test_51Ml5u1B46Hybyi0DScxDrKlLM4qbLwekHUYEXRrmssqwhxS66rVFBGDSgYuU5GK5BBGBD3yHBfLZw27Q7NADMYV400ZlIIfSC3"
 // );
 const stripe = require("stripe")(
-  "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"
+  "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"
 );
 
 module.exports = {
@@ -110,7 +110,8 @@ module.exports = {
       { _id: req.params.dmId },
       { $set: { isActive: false } },
       { new: true }
-    ).then(async (updatedDocument) => {
+    )
+      .then(async (updatedDocument) => {
         let subscription = await Subscription.findOne({
           refUser: req.user._id,
         });
@@ -124,17 +125,14 @@ module.exports = {
           );
           if (filteredItems.length > 0) {
             const subscriptionIdForDutyManager = filteredItems[0]?.id;
-            await stripe.subscriptions.update(
-              subscription.subscriptionId,
-              {
-                items: [
-                  {
-                    id: subscriptionIdForDutyManager,
-                    quantity: totalQuantity - 1,
-                  },
-                ],
-              }
-            );
+            await stripe.subscriptions.update(subscription.subscriptionId, {
+              items: [
+                {
+                  id: subscriptionIdForDutyManager,
+                  quantity: totalQuantity - 1,
+                },
+              ],
+            });
             const index = subscription.subscriptionItems.findIndex(
               (item) => item.id === subscriptionIdForDutyManager
             );
@@ -145,7 +143,6 @@ module.exports = {
           // console.log("totalQuantity", totalQuantity, filteredItems);
           // return res.status(201).json({ message: "Duty Manager Added", totalQuantity, filteredItems });
         }
-        
       })
       .catch((err) => {
         console.log(err);

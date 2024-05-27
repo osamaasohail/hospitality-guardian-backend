@@ -6,7 +6,7 @@ const Subscription = require("../models/Subscription");
 //   "sk_test_51Ml5u1B46Hybyi0DScxDrKlLM4qbLwekHUYEXRrmssqwhxS66rVFBGDSgYuU5GK5BBGBD3yHBfLZw27Q7NADMYV400ZlIIfSC3"
 // );
 const stripe = require("stripe")(
-  "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"
+  "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"
 );
 
 module.exports = {
@@ -20,7 +20,10 @@ module.exports = {
       });
   },
   getOne: async (req, res) => {
-    SecurityCertificates.findOne({ certId: req.params.certId, _id: req.params.scId })
+    SecurityCertificates.findOne({
+      certId: req.params.certId,
+      _id: req.params.scId,
+    })
       .then((docs) => {
         res.status(201).json({ securityCertificate: docs });
       })
@@ -46,7 +49,7 @@ module.exports = {
       let subscription = await Subscription.findOne({ refUser: req.user._id });
       if (subscription) {
         const filteredItems = subscription?.subscriptionItems?.filter(
-          (item) => item.isSecurityCertificate=== true
+          (item) => item.isSecurityCertificate === true
         );
         const totalQuantity = filteredItems.reduce(
           (sum, item) => sum + item.quantity,
@@ -124,17 +127,14 @@ module.exports = {
           );
           if (filteredItems.length > 0) {
             const subscriptionIdForSecurityCertificate = filteredItems[0]?.id;
-            await stripe.subscriptions.update(
-              subscription.subscriptionId,
-              {
-                items: [
-                  {
-                    id: subscriptionIdForSecurityCertificate,
-                    quantity: totalQuantity - 1,
-                  },
-                ],
-              }
-            );
+            await stripe.subscriptions.update(subscription.subscriptionId, {
+              items: [
+                {
+                  id: subscriptionIdForSecurityCertificate,
+                  quantity: totalQuantity - 1,
+                },
+              ],
+            });
             const index = subscription.subscriptionItems.findIndex(
               (item) => item.id === subscriptionIdForSecurityCertificate
             );
@@ -145,7 +145,6 @@ module.exports = {
           // console.log("totalQuantity", totalQuantity, filteredItems);
           // return res.status(201).json({ message: "Security Certificate Added", totalQuantity, filteredItems });
         }
-        
       })
       .catch((err) => {
         console.log(err);
